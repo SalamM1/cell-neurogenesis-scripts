@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Recovery", menuName = "Custom/Recovery")]
+[CreateAssetMenu(fileName = "New Recovery", menuName = "Custom")]
 public class Pickup : ScriptableObject {
 
     public PICKUPS type;

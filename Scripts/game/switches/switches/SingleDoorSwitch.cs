@@ -1,4 +1,5 @@
-﻿using Sirenix.Serialization;
+﻿using DG.Tweening;
+using Sirenix.Serialization;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;

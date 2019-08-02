@@ -104,7 +104,7 @@ namespace com.egamesstudios.cell
             
             if (cooldown == null)
             {
-                if(GetCost() <= cell.vars.currentEnergy)
+                if(GetCost() <= cell.vars.mainEnergy)
                 {
                     switch (cell.vars.equippedGun)
                     {
@@ -123,7 +123,7 @@ namespace com.egamesstudios.cell
                     }
                     bullet.GetComponent<Bullet>().Shoot(cell, direction, shotRange, chargeMultiplier);
                     if(gunImageObj.transform.localScale.x > 1.15f) bullet.GetComponent<Bullet>().transform.localScale = gunImageObj.transform.localScale;
-                    cell.vars.currentEnergy -= GetCost();
+                    cell.vars.mainEnergy -= GetCost();
                 }
             }
             

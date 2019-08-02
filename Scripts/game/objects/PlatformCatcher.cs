@@ -14,6 +14,10 @@ namespace com.egamesstudios.cell
         {
             targets = new List<Transform>();
         }
+        public void ClearTargets()
+        {
+            targets.Clear();
+        }
         void OnTriggerEnter2D(Collider2D col)
         {
             if (!targets.Contains(col.transform) && (col.tag.Equals("Cell") || col.tag.Equals("Enemy") || col.tag.Equals("NPC") || col.tag.Equals("Block"))) targets.Add(col.transform);

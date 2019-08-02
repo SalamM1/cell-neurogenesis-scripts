@@ -8,14 +8,21 @@ namespace com.egamesstudios.cell
     {
         [SerializeField]
         private Pickup itemStats;
+        private readonly static float CELL_DISTANCE = 9f; //3^2
 
-
-        // Use this for initialization
         void Start()
         {
             gameObject.GetComponent<SpriteRenderer>().sprite = itemStats.image;
         }
 
+        private void Update()
+        {
+            Vector3 heading = VariableContainer.variableContainer.currentActive.transform.position - transform.position;
+            if (heading.sqrMagnitude <= CELL_DISTANCE)
+            {
+                transform.position += (heading.normalized * Time.deltaTime * 4);
+            }
+        }
         private void OnTriggerEnter2D(Collider2D collision)
         {
             if (collision.tag.Equals("Cell"))
@@ -29,6 +36,7 @@ namespace com.egamesstudios.cell
                         collision.gameObject.GetComponent<CellController>().RecoverEnergy(itemStats.value);
                         break;
                     case PICKUPS.MONEY:
+                        VariableContainer.variableContainer.mainCell.UpdateMoney(itemStats.value);
                         break;
                 }
                 Destroy(gameObject);

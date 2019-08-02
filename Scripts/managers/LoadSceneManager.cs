@@ -68,9 +68,11 @@ namespace com.egamesstudios.cell
         {
             UIManager.uIManager.ChangeState(UIState.TRANSITION, true);
             VariableContainer.variableContainer.mainCell.ChangeState(State.DEAD);
+            VariableContainer.variableContainer.mainCell.GetComponent<CloneController>().KillAllClones();
+            VariableContainer.variableContainer.mainCell.FullRecovery();
+            SaveManager.saveManager.SaveGame();
             yield return new WaitForSecondsRealtime(4.2f);
 
-            SaveManager.saveManager.LoadGame();
 
             //music reset
             checkpointID = -1;

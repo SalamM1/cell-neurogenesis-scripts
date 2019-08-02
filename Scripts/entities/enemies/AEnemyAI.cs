@@ -17,14 +17,14 @@ namespace com.egamesstudios.cell
     public abstract class AEnemyAI : MonoBehaviour
     {
         [FoldoutGroup("State")]
-        public bool alive;
-        [FoldoutGroup("State")]
-        public bool canThaw, canBeKnockbacked, isKnocked, castingAttack;
-        [FoldoutGroup("Data")]
-        public int enemyID, attackID, health, contactDamage, attackDamage;
-        [FoldoutGroup("Data")]
-        public float speed, detectionRange, awareSpeedFactor;
-        [FoldoutGroup("Timers")]
+        protected bool alive;
+        [FoldoutGroup("State"), SerializeField]
+        protected bool canThaw, canBeKnockbacked, isKnocked, castingAttack;
+        [FoldoutGroup("Data"), SerializeField]
+        protected int enemyID, attackID, health, contactDamage, attackDamage;
+        [FoldoutGroup("Data"), SerializeField]
+        protected float speed, detectionRange, awareSpeedFactor;
+        [FoldoutGroup("Timers"), SerializeField]
         public float timeBetweenAttacks, timeToThaw, timeToStun, timeToBeAware, timeToBeIdle, timeToKnockback, timeToAttack;
         protected float TIME_BETWEEN_ATTACKS;
         protected float TIME_TO_THAW;
@@ -231,8 +231,10 @@ namespace com.egamesstudios.cell
 
         protected bool CheckForGround(Vector2 offset)
         {
-
-            return true;
+            var spr = GetComponentInChildren<SpriteRenderer>();
+            RaycastHit2D hit = Physics2D.CircleCast(transform.position + (Vector3)offset,
+                0.25f, new Vector2(0, -1), spr.bounds.extents.y, LayerMask.GetMask("Platform"));
+            return (hit.collider);
         }
 
         protected void UpdateAnimations(string trigger)
@@ -308,8 +310,9 @@ namespace com.egamesstudios.cell
 
         public bool IsGrounded()
         {
+            var spr = GetComponentInChildren<SpriteRenderer>();
             RaycastHit2D hit = Physics2D.CircleCast(transform.position,
-                0.25f, new Vector2(0, -1), 0.57f, LayerMask.GetMask("Platform"));
+                0.25f, new Vector2(0, -1), spr.bounds.extents.y, LayerMask.GetMask("Platform"));
             return (hit.collider);
         }
 

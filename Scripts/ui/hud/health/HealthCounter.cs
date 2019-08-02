@@ -23,8 +23,8 @@ namespace com.egamesstudios.cell
         {
             hpValue.text = "" + VariableContainer.variableContainer.mainCell.vars.mainHealth;
             hpBar.fillAmount = (float)VariableContainer.variableContainer.mainCell.vars.mainHealth / VariableContainer.variableContainer.mainCell.vars.maxHealth;
-            epValue.text = "" + VariableContainer.variableContainer.mainCell.vars.currentEnergy;
-            epBar.fillAmount = (float)VariableContainer.variableContainer.mainCell.vars.currentEnergy / VariableContainer.variableContainer.mainCell.vars.maxEnergy;
+            epValue.text = "" + VariableContainer.variableContainer.mainCell.vars.mainEnergy;
+            epBar.fillAmount = (float)VariableContainer.variableContainer.mainCell.vars.mainEnergy / VariableContainer.variableContainer.mainCell.vars.maxEnergy;
         }
     }
 }

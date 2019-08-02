@@ -25,6 +25,7 @@ namespace com.egamesstudios.cell
         private string fileExtension = ".neurodata";
         private int saveSlot;
         private Games[] gameList;
+        [OdinSerialize, NonSerialized]
         public Games activeGame;
 
         void Awake()
@@ -67,8 +68,10 @@ namespace com.egamesstudios.cell
         public void SaveGame()
         {
             // autoSaveAnim.SetActive(true);
-            SaveCellData();
+            CellController mainCell = VariableContainer.variableContainer ? VariableContainer.variableContainer.mainCell : FindObjectOfType<CellController>();
+            activeGame.cellData.SaveCellData(mainCell.vars);
             activeGame.RegenerateEnemies();
+
             DataFormat dataFormat = DataFormat.JSON;
             byte[] bytes = SerializationUtility.SerializeValue(activeGame, dataFormat);
             using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Write))
@@ -80,14 +83,6 @@ namespace com.egamesstudios.cell
         }
 
         #region CellData
-        //Use when saving things like equipment or location
-        public void SaveCellData()
-        {
-            CellController mainCell = VariableContainer.variableContainer ? VariableContainer.variableContainer.mainCell : FindObjectOfType<CellController>();
-            if(activeGame != null) activeGame.SaveCellData(mainCell.vars);
-        }
-
-        //Use when resetting the game without leaving the save (eg. dying)
         public void LoadCellData()
         {
             activeGame.RegenerateEnemies();

@@ -26,6 +26,10 @@ namespace com.egamesstudios.cell
             cellData = new CellData();
             powerups = new Dictionary<CollectableType, bool[]>();
             PopulatePowerups();
+        }
+
+        public void PopulateGameFlags()
+        {
             worldFlags = new bool[4][];
             for (int i = 0; i < 4; i++)
             {
@@ -34,11 +38,9 @@ namespace com.egamesstudios.cell
             compendiumFlags = new bool[2][];
             compendiumFlags[0] = new bool[128];
             compendiumFlags[1] = new bool[128];
-            roomFlags = new Dictionary<string, RoomSaveData>();
-        }
 
-        public void PopulateGameFlags()
-        {
+            roomFlags = new Dictionary<string, RoomSaveData>();
+
             var splitFile = new string[] { "\r\n", "\r", "\n", System.Environment.NewLine };
             string[] content = ((TextAsset)Resources.Load("newSaveData", typeof(TextAsset))).text.Split(splitFile, StringSplitOptions.None);
             foreach (String s in content)
@@ -67,11 +69,6 @@ namespace com.egamesstudios.cell
             powerups.Add(CollectableType.GUN_UPGRADE, new bool[7]);
         }
 
-        public void SaveCellData(CellVariables vars)
-        {
-            cellData.SaveCellData(vars);
-        }
-
         public void LoadCellData(CellVariables vars)
         {
             foreach (CollectableType type in powerups.Keys)
@@ -86,7 +83,7 @@ namespace com.egamesstudios.cell
                         break;
                     case CollectableType.ENERGY:
                         combinedDamage = 100 + boolArray.Count(c => c) * 20;
-                        vars.maxEnergy = vars.currentEnergy = combinedDamage;
+                        vars.maxEnergy = vars.mainEnergy = combinedDamage;
                         break;
                     case CollectableType.ABILITY:
                         // vars.hasGuitar = boolArray[0];

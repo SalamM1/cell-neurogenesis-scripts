@@ -107,7 +107,7 @@ namespace com.egamesstudios.cell
         public bool hasGroundPound;
 
         [FoldoutGroup("General")]
-        public int maxHealth, mainHealth, currentEnergy, maxEnergy, activeClones;
+        public int maxHealth, mainHealth, mainEnergy, maxEnergy, activeClones;
 
         [FoldoutGroup("Speed Modifiers", 3)]
         public float movement;
@@ -159,8 +159,13 @@ namespace com.egamesstudios.cell
         [FoldoutGroup("Combat")]
         public GunType equippedGun = GunType.NORMAL;
 
+        [FoldoutGroup("Saves")]
         public string savedRoom;
+        [FoldoutGroup("Saves")]
         public Vector2 saveCheckpoint;
+
+        [FoldoutGroup("Saves")]
+        public int coinCount;
     }
 }
 

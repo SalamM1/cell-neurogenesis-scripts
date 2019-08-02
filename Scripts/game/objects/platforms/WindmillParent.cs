@@ -35,7 +35,7 @@ namespace com.egamesstudios.cell
 
         }
         // Update is called once per frame
-        void Update()
+        void FixedUpdate()
         {
             for (int i = fanCount - 1; i >= 0; i--)
             {

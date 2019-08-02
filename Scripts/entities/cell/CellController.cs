@@ -92,6 +92,7 @@ namespace com.egamesstudios.cell
 
         void Update()
         {
+           // Debug.Log((int) (1.0f / Time.deltaTime)); //FPS counter quick
             if(vars.isDead)
             {
                 if(!vars.isClone)
@@ -738,15 +739,42 @@ namespace com.egamesstudios.cell
                 }
                 else
                 {
-                    if (vars.currentEnergy == vars.maxEnergy)
+                    if (vars.mainEnergy == vars.maxEnergy)
                         yield break;
-                    vars.currentEnergy++;
+                    vars.mainEnergy++;
                 }
                 yield return new WaitForSecondsRealtime(0.03333f);
             }
            
         }
 
+        public void UpdateMoney(int changeValue)
+        {
+            StartCoroutine(IncrementMoney(Math.Abs(changeValue), changeValue > 0));
+        }
+
+        private IEnumerator IncrementMoney(int value, bool positive)
+        {
+            for (int i = 0; i < value; i++)
+            {
+                if (vars.coinCount < 0)
+                {
+                    vars.coinCount = 0;
+                    yield break;
+                }
+                if(positive)
+                    vars.coinCount++;
+                else
+                    vars.coinCount--;
+                yield return new WaitForSecondsRealtime(0.03333f);
+            }
+
+        }
+        public void FullRecovery()
+        {
+            vars.mainHealth = vars.maxHealth;
+            vars.mainEnergy = vars.maxEnergy;
+        }
         /// <summary>
         /// Sets players speed during TRANSITION state
         /// </summary>

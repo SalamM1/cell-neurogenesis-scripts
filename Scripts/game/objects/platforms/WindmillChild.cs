@@ -18,14 +18,15 @@ namespace com.egamesstudios.cell
 
         public void MovePlatform()
         {
-            angle += windmillParent.speed * Time.deltaTime;
+            angle += windmillParent.speed * Time.fixedDeltaTime;
             Vector3 startPos = transform.localPosition;
             transform.localPosition = new Vector3(Mathf.Cos(Mathf.Deg2Rad * angle), Mathf.Sin(Mathf.Deg2Rad * angle), 0) * windmillParent.radius;
             Vector3 offset = transform.localPosition - startPos;
 
             foreach (Transform target in targets)
             {
-                target.position += offset;
+                //target.position += offset;
+                target.Translate(offset);
             }
         }
     }

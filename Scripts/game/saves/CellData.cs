@@ -20,7 +20,7 @@ namespace com.egamesstudios.cell
 
         public void LoadCellData(CellVariables vars)
         {
-            //vars.oreCollected?
+            vars.coinCount = stats[0];
             //vars.oreUsed?
             //vars.hatID = stats[2];
             vars.equippedGun = (GunType) stats[3];
@@ -34,7 +34,7 @@ namespace com.egamesstudios.cell
 
         public void SaveCellData(CellVariables vars)
         {
-            //vars.oreCollected?
+            stats[0] = vars.coinCount;
             //vars.oreUsed?
             //stats[2] = vars.hatID;
             stats[3] = (int)vars.equippedGun;
