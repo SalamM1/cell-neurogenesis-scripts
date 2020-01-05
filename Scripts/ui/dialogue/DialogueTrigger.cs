@@ -23,13 +23,13 @@ namespace com.egamesstudios.cell
                 DialogueManager.dialogueManager.DisplayNextSentence();
                 if (!DialogueManager.dialogueManager.isTriggered)
                 {
-                    interactableObject.EndDialogueState();
+                    interactableObject.EndInteraction();
                 }
             }
             else
             {
                 DialogueManager.dialogueManager.StartDialogue(dialogue);
-                interactableObject.TriggerDialogueState(VariableContainer.variableContainer.currentActive.transform);
+                interactableObject.TriggerInteraction(VariableContainer.variableContainer.currentActive.transform);
             }
  
         }

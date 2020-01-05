@@ -2,36 +2,39 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 
 namespace com.egamesstudios.cell
 {
-    [RequireComponent(typeof(AudioSource))]
     public class SFXPlayer : MonoBehaviour
     {
-        [OdinSerialize]
         public AudioClip[] sfxClips;
-        private AudioSource source;
-        private int i;
+        [SerializeField]
+        private AudioMixerGroup mixer;
 
-        // Use this for initialization
-        void Start()
-        {
-            source = GetComponent<AudioSource>();
-        }
-
-        public void PlaySFX(int index)
+        public void PlaySFX(int index, float volume = 1f,  float pitch = 1f)
         {
             if (index < sfxClips.Length && index >= 0)
             {
-          //      source.Stop();
-                source.clip = sfxClips[index];
-                source.PlayOneShot(sfxClips[index]);
+                PlayClipAtPoint(sfxClips[index], transform.position, volume, pitch);
             }
         }
 
-        public void SetPitch(float val)
+        private AudioSource PlayClipAtPoint(AudioClip clip, Vector3 position, float volume, float pitch)
         {
-            source.pitch = val;
+            var go = new GameObject("TempAudio");
+            go.transform.position = position;
+            var audioSource = go.AddComponent<AudioSource>();
+
+            audioSource.clip = clip;
+            audioSource.volume = volume;
+            audioSource.pitch = pitch;
+            audioSource.outputAudioMixerGroup = mixer;
+
+            audioSource.Play();
+            Destroy(go, clip.length);
+
+            return audioSource;
         }
     }
 }

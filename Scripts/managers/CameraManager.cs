@@ -37,10 +37,10 @@ namespace com.egamesstudios.cell
 
         private void InitializeCam()
         {
-            cam.UpdateScreenSize(screenSize);
             if (DEBUG) Destroy(cam.GetComponent<ProCamera2DNumericBoundaries>());
 
             var forward = cam.GetComponent<ProCamera2DForwardFocus>();
+            if (!forward) 
             forward.Progressive = true;
             forward.SpeedMultiplier = 3;
             forward.TransitionSmoothness = 0.208333333f;
@@ -49,12 +49,21 @@ namespace com.egamesstudios.cell
             forward.TopFocus = 0.09f;
             forward.BottomFocus = 0.16f;
 
+            var pixel = cam.GetComponent<ProCamera2DPixelPerfect>();
+            if (!pixel) pixel = cam.gameObject.AddComponent<ProCamera2DPixelPerfect>();
+            pixel.PixelsPerUnit = PPU;
+            pixel.ViewportAutoScale = AutoScaleMode.None;
+            pixel.SnapMovementToGrid = pixel.SnapCameraToGrid = true;
+            cam.UpdateScreenSize(screenSize);
+
+
             CutsceneManager.cutsceneManager.UpdateCinematics(cam.GetComponent<ProCamera2DCinematics>());
         }
         public void AddNewCell(CellController cell)
         {
-            cam.RemoveAllCameraTargets();
-            cam.AddCameraTarget(cell.transform, 1, 1, 0, new Vector2(offsetX, offsetY));
+            float duration = 0.25f;
+            cam.RemoveAllCameraTargets(duration);
+            cam.AddCameraTarget(cell.transform, 1, 1, duration, new Vector2(offsetX, offsetY));
         }
     }
 }

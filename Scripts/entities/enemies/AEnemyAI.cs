@@ -25,7 +25,7 @@ namespace com.egamesstudios.cell
         [FoldoutGroup("Data"), SerializeField]
         protected float speed, detectionRange, awareSpeedFactor;
         [FoldoutGroup("Timers"), SerializeField]
-        public float timeBetweenAttacks, timeToThaw, timeToStun, timeToBeAware, timeToBeIdle, timeToKnockback, timeToAttack;
+        protected float timeBetweenAttacks, timeToThaw, timeToStun, timeToBeAware, timeToBeIdle, timeToKnockback, timeToAttack;
         protected float TIME_BETWEEN_ATTACKS;
         protected float TIME_TO_THAW;
         protected float TIME_TO_STUN;
@@ -38,16 +38,21 @@ namespace com.egamesstudios.cell
         public Vector3 originalPosition;
         [SerializeField]
         private EnemyType enemyType;
-        protected Rigidbody2D rb;
         private LayerMask layerMask;
-        private static HashSet<State> validChaseStates;
+
         protected Animator animator;
+        protected Rigidbody2D rb;
+
+        [SerializeField]
+        [FoldoutGroup("Data")]
+        protected DropTable dropTable;
+        private static HashSet<State> validChaseStates;
 
         [SerializeField]
         [FoldoutGroup("State")]
         protected float knockbackForce, knockbackMultiplier;
-        [FoldoutGroup("State")]
-        public EnemyState state;
+        [ShowInInspector]
+        private EnemyState state;
 
         // Use this for initialization
         void Awake()
@@ -76,6 +81,7 @@ namespace com.egamesstudios.cell
             TIME_TO_BE_AWARE = timeToBeAware;
             TIME_TO_BE_IDLE = timeToBeIdle;
             TIME_TO_KNOCKBACK = timeToKnockback;
+            TIME_TO_ATTACK = timeToAttack;
             OnStart();
         }
 
@@ -86,7 +92,7 @@ namespace com.egamesstudios.cell
             {
                 if(state != EnemyState.IDLE)
                 {
-                    EnterState(EnemyState.IDLE);
+                    ChangeState(EnemyState.IDLE);
                 }
                 rb.velocity = Vector2.zero;
             }
@@ -211,6 +217,7 @@ namespace com.egamesstudios.cell
                     break;
                 case EnemyState.ACTION:
                     UpdateAnimations("action");
+                    UpdateAnimations("attack" + attackID);
                     break;
                 case EnemyState.FROZEN:
                     UpdateAnimations("frozen");
@@ -219,6 +226,7 @@ namespace com.egamesstudios.cell
                     UpdateAnimations("stunned");
                     break;
                 case EnemyState.DEAD:
+                    DropItems();
                     UpdateAnimations("dead");
                     alive = false;
                     SaveManager.saveManager.currentRoom[1,enemyID] = SaveManager.saveManager.activeGame.compendiumFlags[1][(int)enemyType] = true;
@@ -265,9 +273,10 @@ namespace com.egamesstudios.cell
         {
             ParticleManager.particleManager.PlayParticle(FXType.ENEMY, 1, transform.position);
             health -= damage;
+            GetComponent<SFXPlayer>().PlaySFX(0, 0.5f, health <= 0 ? 0.75f : 1.75f);
             if (health <= 0)
             {
-                EnterState(EnemyState.DEAD);
+                ChangeState(EnemyState.DEAD);
             }
         }
 
@@ -275,7 +284,6 @@ namespace com.egamesstudios.cell
         {
             Damage(damage);
             Knockback(source);
-            //SFXManager.sfxManager.PlaySFX(0, GetComponent<AudioSource>());
             
         }
 
@@ -283,7 +291,6 @@ namespace com.egamesstudios.cell
         {
             Damage(damage);
             Knockback(source, knockbackMultiplier);
-            //SFXManager.sfxManager.PlaySFX(0, GetComponent<AudioSource>());
         }
 
         public void Knockback(Transform source)
@@ -308,6 +315,20 @@ namespace com.egamesstudios.cell
             Knockback(source);
         }
 
+        protected void DropItems()
+        {
+            Vector3 randomVec;
+
+            foreach (GameObject pickup in dropTable.pickups)
+            {
+                if (pickup)
+                {
+                    randomVec = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), 0) * 0.75f;
+                    Instantiate(pickup, transform.position + randomVec, Quaternion.identity);
+                }
+            }
+        }
+
         public bool IsGrounded()
         {
             var spr = GetComponentInChildren<SpriteRenderer>();
@@ -318,12 +339,11 @@ namespace com.egamesstudios.cell
 
         protected virtual void OnCollisionEnter2D(Collision2D collision)
         {
-            if (collision.gameObject.GetComponent<CellController>() != null)
+            if (collision.gameObject.GetComponent<CellController>())
             {
                 collision.gameObject.GetComponent<CellController>().TakeHit(transform, castingAttack ? attackDamage : contactDamage, DamageType.ENEMY);
                 if (castingAttack) ChangeState(EnemyState.IDLE);
             }
-            if ((collision.gameObject.layer == 8 || collision.gameObject.layer == 12) && castingAttack) ChangeState(EnemyState.IDLE);
         }
     }
 }

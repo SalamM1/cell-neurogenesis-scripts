@@ -4,7 +4,7 @@ namespace com.egamesstudios.cell
 {
     public interface IInteractable
     {
-        void TriggerDialogueState(Transform CellPosition);
-        void EndDialogueState();
+        void TriggerInteraction(Transform CellPosition);
+        void EndInteraction();
     }
 }

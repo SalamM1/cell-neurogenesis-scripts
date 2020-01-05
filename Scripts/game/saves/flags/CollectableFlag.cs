@@ -37,21 +37,49 @@ namespace com.egamesstudios.cell
                     else
                     {
                         collision.GetComponent<CellController>().PlayAnimation(CellAnimation.PICKUP);
-                        PlayPickupAnimation();
                         (SaveManager.saveManager.activeGame.powerups[type])[ID] = true;
-                        gameObject.SetActive(false);
+
+                        try
+                        {
+                            GetComponent<Collider2D>().enabled = false;
+                            GetComponent<HoveringItem>().enabled = false;
+                            GetComponent<ScalingObject>().enabled = false;
+                        } 
+                        catch (Exception e)
+                        {
+                            Debug.LogWarning(e);
+                        }
+                        StartCoroutine(PlayPickupAnimation());
                     }
-
                 }
-
-            }
-          
+            }         
         }
 
-        private void PlayPickupAnimation()
+        private IEnumerator PlayPickupAnimation()
         {
-         
+            float theta = 90;
+            transform.localScale = Vector3.one * 0.5f;
+            GetComponent<SFXPlayer>().PlaySFX(0, 0.3f, 1.25f);
+            while (theta >= -1350)
+            {
+                transform.position = new Vector3(Mathf.Cos(Mathf.Deg2Rad * theta), Mathf.Sin(Mathf.Deg2Rad * theta) - 0.15f, 0) * (1 - Mathf.Abs(theta / 1350)) 
+                    + VariableContainer.variableContainer.mainCell.transform.position;
+                theta -= Time.deltaTime * 890f;
+                yield return new WaitForEndOfFrame();
+            }
+            switch (type)
+            {
+                case CollectableType.HEALTH:
+                    VariableContainer.variableContainer.mainCell.UpgradeMaxHealth();
+                    break;
+
+                case CollectableType.ENERGY:
+                    VariableContainer.variableContainer.mainCell.UpgradeMaxEnergy();
+                    break;
+            }
+            GetComponent<SFXPlayer>().PlaySFX(1, 0.5f, 0.85f);
+            Destroy(gameObject);
+            yield return null;
         }
     }
 }
-

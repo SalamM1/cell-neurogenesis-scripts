@@ -7,39 +7,27 @@ namespace com.egamesstudios.cell
 {
 	public class BeatBlockPlatform : BeatBlockChild
 	{
-        private Collider2D attachedCollider;
-
-        private void Awake()
-        {
-            attachedCollider = GetComponent<Collider2D>();
-        }
         protected override void SwitchToActive()
         {
-            GetComponentInChildren<SpriteRenderer>().sprite = activeSprite;
-            attachedCollider.enabled = true;
+            SetActive();
         }
 
         protected override void SwitchToInactive()
         {
-            GetComponentInChildren<SpriteRenderer>().sprite = inactiveSprite;
-            attachedCollider.enabled = false;
+            SetInactive();
         }
 
-        [ButtonGroup]
-        public void SetActive()
+
+        public override void SetActive()
         {
-            active = true;
-            GetComponentInChildren<SpriteRenderer>().sprite = activeSprite;
-            attachedCollider = GetComponent<Collider2D>();
-            attachedCollider.enabled = true;
+            base.SetActive();
+            GetComponent<Collider2D>().enabled = true;
         }
-        [ButtonGroup]
-        public void SetInactive()
+
+        public override void SetInactive()
         {
-            active = false;
-            GetComponentInChildren<SpriteRenderer>().sprite = inactiveSprite;
-            attachedCollider = GetComponent<Collider2D>();
-            attachedCollider.enabled = false;
+            base.SetInactive();
+            GetComponent<Collider2D>().enabled = false;
         }
     }
 }

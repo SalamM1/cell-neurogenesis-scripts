@@ -7,12 +7,12 @@ namespace com.egamesstudios.cell
 {
     public class HymirSave : MonoBehaviour, IInteractable
     {
-        public void EndDialogueState()
+        public void EndInteraction()
         {
             
         }
 
-        public void TriggerDialogueState(Transform CellPosition)
+        public void TriggerInteraction(Transform CellPosition)
         {
             CellController mainCell = VariableContainer.variableContainer.mainCell;
             mainCell.vars.saveCheckpoint = transform.position;

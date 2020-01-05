@@ -28,7 +28,7 @@ namespace com.egamesstudios.cell
             isOpen = !isOpen;
         }
 
-        public void SetDoorState(bool open)
+        public override void SetState(bool open)
         {
             if (isOpen == open || inactive) return;
             else Trigger();

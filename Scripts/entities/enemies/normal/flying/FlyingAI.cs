@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Sirenix.OdinInspector;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,8 +8,10 @@ namespace com.egamesstudios.cell
     public class FlyingAI : AEnemyAI
     {
         [SerializeField]
+        [FoldoutGroup("Flying")]
         protected float hoverDistance;
         [SerializeField]
+        [FoldoutGroup("Flying")]
         protected float timeToLoseChase, hoverScalingRate;
         protected float TIME_TO_LOSE_CHASE, RANDOM_MOVE_TIMER, randomMoveTimer, hoverShortFactor;
         protected Vector2 cellDirection, randomMoveSpeed;
@@ -17,7 +20,7 @@ namespace com.egamesstudios.cell
         protected override void OnStart()
         {
             rb.gravityScale = 0;
-            hoverShortFactor = 0.6f;
+            hoverShortFactor = 0.18f*hoverDistance;
             TIME_TO_LOSE_CHASE = timeToLoseChase;
             RANDOM_MOVE_TIMER = 1;
             randomMoveTimer = 0;
@@ -42,7 +45,7 @@ namespace com.egamesstudios.cell
                 if(timeBetweenAttacks <= 0)
                 {
                     timeBetweenAttacks = TIME_BETWEEN_ATTACKS;
-                    if (CellDistance() <= hoverDistance && CellDistance() >= hoverDistance * hoverShortFactor && Random.Range(0.0f, 1.0f) >= 0.2f)
+                    if (CellDistance() <= hoverDistance && CellDistance() >= hoverDistance * hoverShortFactor && Random.Range(0.0f, 1.0f) >= 0.6f)
                     {
                         attackID = 0;
                     }
@@ -50,7 +53,7 @@ namespace com.egamesstudios.cell
                     {
                         attackID = 1;
                     }
-                    EnterState(EnemyState.ACTION);
+                    ChangeState(EnemyState.ACTION);
                 }
                 else
                 {
@@ -66,7 +69,7 @@ namespace com.egamesstudios.cell
                             }
                             if (randomMoveTimer <= 0)
                             {
-                                randomMoveSpeed = (new Vector2(Mathf.Cos(Mathf.Deg2Rad * Random.Range(0, 360)), Mathf.Sin(Mathf.Deg2Rad * Random.Range(0, 360))).normalized) * speed * 0.1f;
+                                randomMoveSpeed = (new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f))) * speed * 0.1f;
                                 randomMoveTimer = RANDOM_MOVE_TIMER;
                             }
                             else
@@ -144,6 +147,12 @@ namespace com.egamesstudios.cell
             RaycastHit2D hitInfo = Physics2D.Raycast(VariableContainer.variableContainer.currentActive.transform.position, direction, hoverDistance, LayerMask.GetMask("Platform", "MovingPlatform"));
             if (hitInfo) return hitInfo.point;
             return VariableContainer.variableContainer.currentActive.transform.position + direction * hoverDistance;
+        }
+
+        protected override void OnCollisionEnter2D(Collision2D collision)
+        {
+            base.OnCollisionEnter2D(collision);
+            if ((collision.gameObject.layer == 8 || collision.gameObject.layer == 12) && castingAttack) ChangeState(EnemyState.IDLE);
         }
     }
 }

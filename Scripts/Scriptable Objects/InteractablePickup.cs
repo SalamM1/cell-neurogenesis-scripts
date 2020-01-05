@@ -8,7 +8,7 @@ namespace com.egamesstudios.cell
     {
         [SerializeField]
         private Pickup itemStats;
-        private readonly static float CELL_DISTANCE = 9f; //3^2
+        private readonly static float CELL_DISTANCE = 2.25f; //1.5^2
 
         void Start()
         {
@@ -20,7 +20,7 @@ namespace com.egamesstudios.cell
             Vector3 heading = VariableContainer.variableContainer.currentActive.transform.position - transform.position;
             if (heading.sqrMagnitude <= CELL_DISTANCE)
             {
-                transform.position += (heading.normalized * Time.deltaTime * 4);
+                transform.position += (heading.normalized * Time.deltaTime * 10);
             }
         }
         private void OnTriggerEnter2D(Collider2D collision)
@@ -31,6 +31,7 @@ namespace com.egamesstudios.cell
                 {
                     case PICKUPS.HEALTH:
                         collision.gameObject.GetComponent<CellController>().RecoverHealth(itemStats.value);
+                        GetComponent<SFXPlayer>().PlaySFX(0, 0.4f, 1.85f);
                         break;
                     case PICKUPS.ENERGY:
                         collision.gameObject.GetComponent<CellController>().RecoverEnergy(itemStats.value);
@@ -39,6 +40,8 @@ namespace com.egamesstudios.cell
                         VariableContainer.variableContainer.mainCell.UpdateMoney(itemStats.value);
                         break;
                 }
+                //playSFX
+                //playParticle?
                 Destroy(gameObject);
             }
         }

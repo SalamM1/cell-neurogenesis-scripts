@@ -79,7 +79,7 @@ namespace com.egamesstudios.cell
             }
         }
 
-        public void TriggerDialogueState(Transform CellPosition)
+        public void TriggerInteraction(Transform CellPosition)
         {
             if (CellPosition.position.x >= transform.position.x)
             {
@@ -92,7 +92,7 @@ namespace com.egamesstudios.cell
             state = NPCState.DIALOGUE;
         }
 
-        public void EndDialogueState()
+        public void EndInteraction()
         {
             state = NPCState.IDLE;
         }

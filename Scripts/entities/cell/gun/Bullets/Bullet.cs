@@ -21,9 +21,9 @@ namespace com.egamesstudios.cell
         protected bool hasShot, destroy;
         protected HashSet<GameObject> hitObjects;
         [SerializeField]
-        protected LayerMask wallMask;
+        protected static LayerMask wallMask;
         [SerializeField]
-        protected LayerMask generalMask;
+        protected static LayerMask generalMask;
         protected CellController cell;
             
         [SerializeField]
@@ -35,10 +35,11 @@ namespace com.egamesstudios.cell
         private void Start()
         {
             rb2d = GetComponent<Rigidbody2D>();
+            rb2d.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
         }
 
         private void FixedUpdate()
-        {
+        {           
             if (hasShot && !destroy)
             {
                 rb2d.velocity = transform.right * speed;
@@ -48,7 +49,7 @@ namespace com.egamesstudios.cell
                     destroy = true;
                 }
             }
-            else if (destroy)
+            if (destroy)
             {
                 timeToDestroy -= Time.fixedDeltaTime;
                 if (timeToDestroy <= 0)

@@ -13,9 +13,12 @@ namespace com.egamesstudios.cell
         private Sprite doorSprite;
         [OnValueChanged("SetChildren"), EnumToggleButtons]
         public Direction direction;
+
+#if UNITY_EDITOR
         [Button]
         public void SetChildren()
         {
+            size = Mathf.Max(size, 1);
             for (int i = transform.childCount - 1; i >= 0; i--)
             {
                 var temp = transform.GetChild(i);
@@ -25,7 +28,7 @@ namespace com.egamesstudios.cell
             bool vert = (direction == Direction.UP || direction == Direction.DOWN);
             GetComponent<BoxCollider2D>().size = vert ? new Vector2(1, size - 0.01f) : new Vector2(size, 0.99f);
             float rotation = vert ? 0 : 90;
-
+            
             float totalSummon = size / 2;
 
             if (size % 2 != 0)
@@ -59,5 +62,6 @@ namespace com.egamesstudios.cell
             tempChild.transform.localPosition = vert ? new Vector2(0, distance) : new Vector2(distance, 0);
             tempChild.transform.rotation = Quaternion.Euler(0, 0, rotation);
         }
+#endif
     }
 }

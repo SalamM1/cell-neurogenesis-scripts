@@ -34,6 +34,16 @@ namespace com.egamesstudios.cell
             DontDestroyOnLoad(gameObject);
         }
 
+        public void SwitchToClone(int index)
+        {
+            hud.GetComponentInChildren<HUDCloneManager>().SwitchToClone(index);
+        }
+
+        public void SyncClones()
+        {
+            hud.GetComponentInChildren<HUDCloneManager>().SyncClones();
+        }
+
         public void ChangeState(UIState newState, bool dead = false)
         {
             fadeTime = dead ? 2 : 0;

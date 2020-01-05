@@ -67,7 +67,9 @@ namespace com.egamesstudios.cell
             Vector3 from = transform.position - new Vector3(horizontal ? width / 2f : 0, vertical ? height / 2f : 0);
             Vector3 to = transform.position + new Vector3(horizontal ? width / 2f : 0, vertical ? height / 2f : 0);
             Gizmos.DrawLine(from, to);
-            Gizmos.color = (startingPointY >= 2 && startingPointY < 4) ? Color.red : Color.cyan;
+
+            bool isRed = (horizontal) ? (startingPointX >= 2 && startingPointX < 4) : (startingPointY >= 2 && startingPointY < 4);           
+            Gizmos.color = (isRed) ? Color.red : Color.cyan;
             Gizmos.DrawSphere(transform.position + new Vector3(horizontal ? (startingPointX > 2 ? ((4 - startingPointX) * width / 2) : startingPointX * width / 2) - width / 2 : 0, vertical ? (startingPointY > 2 ? ((4 - startingPointY) * height / 2) : (startingPointY * height / 2)) - height / 2 : 0), 0.2f);
         }
 

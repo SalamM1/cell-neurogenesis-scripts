@@ -8,46 +8,34 @@ namespace com.egamesstudios.cell
     [RequireComponent(typeof(Block))]
 	public class BeatBlock : BeatBlockChild
 	{
-        private Collider2D[] colliders;
 
-        private void Awake()
-        {
-            colliders = GetComponents<Collider2D>();
-        }
         protected override void SwitchToActive()
         {
-            GetComponentInChildren<SpriteRenderer>().sprite = activeSprite;
-            GetComponent<Rigidbody2D>().isKinematic = false;
-            colliders[0].enabled = true;
-            colliders[1].enabled = true;
+            SetActive();
         }
 
         protected override void SwitchToInactive()
         {
-            GetComponentInChildren<SpriteRenderer>().sprite = inactiveSprite;
-            GetComponent<Rigidbody2D>().isKinematic = true;
-            colliders[0].enabled = false;
-            colliders[1].enabled = false;
+            SetInactive();
+            GetComponent<Rigidbody2D>().velocity = Vector2.zero;
             GetComponent<Block>().ClearTargets();
         }
 
-        [ButtonGroup]
-        public void SetActive()
+
+        public override void SetActive()
         {
-            active = true;
-            GetComponentInChildren<SpriteRenderer>().sprite = activeSprite;
+            base.SetActive();
             GetComponent<Rigidbody2D>().isKinematic = false;
-            colliders = GetComponents<Collider2D>();
+            var colliders = GetComponents<Collider2D>();
             colliders[0].enabled = true;
             colliders[1].enabled = true;
         }
-        [ButtonGroup]
-        public void SetInactive()
+
+        public override void SetInactive()
         {
-            active = false;
-            GetComponentInChildren<SpriteRenderer>().sprite = inactiveSprite;
+            base.SetInactive();
             GetComponent<Rigidbody2D>().isKinematic = true;
-            colliders = GetComponents<Collider2D>();
+            var colliders = GetComponents<Collider2D>();
             colliders[0].enabled = false;
             colliders[1].enabled = false;
         }

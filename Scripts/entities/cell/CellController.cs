@@ -511,19 +511,31 @@ namespace com.egamesstudios.cell
             }
         }
 
+        //SFX Timers
+        private float stepTimer;
+        private readonly float STEP_TIMER = 0.55f;
+
+
         private void UpdateParticlesAndSound()
         {
             if(rb2d.velocity.x != 0 && vars.grounded)
             {
-                sfx.PlaySFX(0);
-               // particles.PlayParticle(CellParticleType.WALK, new Vector3(0, -0.5f, 0));
+                if (stepTimer >= STEP_TIMER)
+                {
+                    // sfx.PlaySFX(0, 0.6f, 1.2f);
+                    // particles.PlayParticle(CellParticleType.WALK, new Vector3(0, -0.5f, 0));
+                    stepTimer = 0;
+                } 
+                else
+                {
+                    stepTimer += Time.deltaTime;
+                }
             }
             if(vars.wallSliding)
             {
                 sfx.PlaySFX(4);
                 particles.PlayParticle(CellParticleType.WALLSLIDE, new Vector3(vars.wallSlidingLeft ? -0.5f : 0.5f, 0, 0));
             }
-
         }
 
         /// <summary>
@@ -661,7 +673,7 @@ namespace com.egamesstudios.cell
                 yield return null;
             }
             vars.isInvul = false;
-            gameObject.layer = 13;
+            if(gameObject.layer == 14) gameObject.layer = 13;
             foreach (SpriteRenderer spr in GetComponentsInChildren<SpriteRenderer>())
             {
                 spr.color = new Color(1f, 1f, 1f, 1f);
@@ -770,6 +782,19 @@ namespace com.egamesstudios.cell
             }
 
         }
+
+        public void UpgradeMaxHealth()
+        {
+            vars.maxHealth += Games.HEALTH_INCREMENT;
+            FullRecovery();
+        }
+
+        public void UpgradeMaxEnergy()
+        {
+            vars.maxEnergy += Games.ENERGY_INCREMENT;
+            FullRecovery();
+        }
+
         public void FullRecovery()
         {
             vars.mainHealth = vars.maxHealth;

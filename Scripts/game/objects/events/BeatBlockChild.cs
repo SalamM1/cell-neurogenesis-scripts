@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Sirenix.OdinInspector;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,8 +14,7 @@ namespace com.egamesstudios.cell
 
         public void SwitchActive()
 		{
-            active = !active;
-            if(active)
+            if(!active)
                 SwitchToActive();
             else
                 SwitchToInactive();
@@ -22,6 +22,20 @@ namespace com.egamesstudios.cell
 
         protected abstract void SwitchToActive();
         protected abstract void SwitchToInactive();
+
+        [ButtonGroup]
+        public virtual void SetActive()
+        {
+            active = true;
+            GetComponentInChildren<SpriteRenderer>().sprite = activeSprite;
+        }
+
+        [ButtonGroup]
+        public virtual void SetInactive()
+        {
+            active = false;
+            GetComponentInChildren<SpriteRenderer>().sprite = inactiveSprite;
+        }
 
         public void Blink()
         {

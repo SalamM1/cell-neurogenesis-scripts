@@ -133,7 +133,7 @@ namespace com.egamesstudios.cell
 
         int GetCost()
         {
-            int cost = 10;
+            int cost = 25; //Elemental Cost
             if (cell.vars.equippedGun == GunType.NORMAL)
             {
                 switch (cell.vars.equippedBullet)
@@ -142,17 +142,13 @@ namespace com.egamesstudios.cell
                         cost = 5;
                         break;
                     case BulletType.CHARGE:
+                    case BulletType.GHOST:
                         cost = 10;
                         break;
                     case BulletType.CONE:
-                    case BulletType.GHOST:
                         cost = 15;
                         break;
                 }
-            }
-            else
-            {
-                cost = 25;
             }
             return cost;
         }

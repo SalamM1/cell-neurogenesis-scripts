@@ -9,9 +9,7 @@ namespace com.egamesstudios.cell
     [Serializable]
 	public class Games
 	{
-        [OdinSerialize]
         public Dictionary<CollectableType, bool[]> powerups;  //ID based
-        [OdinSerialize]
         public Dictionary<string, RoomSaveData> roomFlags;
         public bool[][] worldFlags;
         public bool[][] compendiumFlags;
@@ -20,9 +18,14 @@ namespace com.egamesstudios.cell
         //public Shop[] shopStock; //ID based
         private string version;
 
+        public static readonly int HEALTH_INCREMENT = 10;
+        public static readonly int ENERGY_INCREMENT = 20;
+        public static readonly int GUITAR_INCREMENT = 4;
+        public static readonly int GUN_INCREMENT = 4;
+
         public Games()
         {
-            version = "Beta 0.1";
+            version = "0.1.1";
             cellData = new CellData();
             powerups = new Dictionary<CollectableType, bool[]>();
             PopulatePowerups();
@@ -74,16 +77,16 @@ namespace com.egamesstudios.cell
             foreach (CollectableType type in powerups.Keys)
             {
                 bool[] boolArray = powerups[type];
-                int combinedDamage = 0;
+                int combinedValue = 0;
                 switch (type)
                 {
                     case CollectableType.HEALTH:
-                        combinedDamage = 40 + boolArray.Count(c => c) * 10;
-                        vars.maxHealth = vars.mainHealth = combinedDamage;
+                        combinedValue = 40 + boolArray.Count(c => c) * HEALTH_INCREMENT;
+                        vars.maxHealth = vars.mainHealth = combinedValue;
                         break;
                     case CollectableType.ENERGY:
-                        combinedDamage = 100 + boolArray.Count(c => c) * 20;
-                        vars.maxEnergy = vars.mainEnergy = combinedDamage;
+                        combinedValue = 100 + boolArray.Count(c => c) * ENERGY_INCREMENT;
+                        vars.maxEnergy = vars.mainEnergy = combinedValue;
                         break;
                     case CollectableType.ABILITY:
                         // vars.hasGuitar = boolArray[0];
@@ -97,12 +100,12 @@ namespace com.egamesstudios.cell
                         vars.hasTripleJump = boolArray[7];
                         break;
                     case CollectableType.GUITAR_UPGRADE:
-                        combinedDamage = boolArray.Count(c => c) * 4 + 5;
-                        vars.guitarDamage = combinedDamage;
+                        combinedValue = 5 + boolArray.Count(c => c) * GUITAR_INCREMENT;
+                        vars.guitarDamage = combinedValue;
                         break;
                     case CollectableType.GUN_UPGRADE:
-                        combinedDamage = boolArray.Count(c => c) * 4 + 5;
-                        vars.gunDamage = combinedDamage;
+                        combinedValue = 5 + boolArray.Count(c => c) * GUITAR_INCREMENT;
+                        vars.gunDamage = combinedValue;
                         break;
                 }
             }
@@ -130,7 +133,6 @@ namespace com.egamesstudios.cell
         {
             roomFlags = new bool[roomFlagCount];
             enemyFlags = new bool[enemyFlagCount];
-            Debug.Log(roomFlags[0]);
         }
 
         public void RegenerateEnemies()

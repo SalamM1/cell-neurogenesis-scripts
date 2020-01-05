@@ -15,7 +15,7 @@ namespace com.egamesstudios.cell
             generalMask = LayerMask.GetMask("Enemy", "Platform", "MovingPlatform");
             //Initialize Data here
             speed = 19.42f;
-            hitObjects = new HashSet<GameObject>();
+            hitObjects = new HashSet<GameObject>();            
         }
 
         public override void Shoot(CellController cell, Vector2 direction, float shotLength, float chargeRate)
@@ -27,7 +27,6 @@ namespace com.egamesstudios.cell
                 speed *= -1;
             }
 
-            RaycastHit2D hitInfo;
             if(cell.vars.equippedBullet == BulletType.CONE)
             {
                 Vector2 cone1 = Vector2.zero;
@@ -64,18 +63,7 @@ namespace com.egamesstudios.cell
             }
             else
             {
-                if (cell.vars.equippedBullet == BulletType.GHOST)
-                {
-                    hitInfo = Physics2D.Raycast(transform.position, direction, shotLength, wallMask);
-                    damageMultiplier = 0.8f;
-                }
-                else
-                {
-                    hitInfo = Physics2D.Raycast(transform.position, direction, shotLength, wallMask);
-                    damageMultiplier = chargeRate;
-                }
-                if (hitInfo) travelDistance = hitInfo.distance;
-
+                damageMultiplier = (cell.vars.equippedBullet == BulletType.GHOST ? 0.8f : 1);
                 hasShot = true;
             }          
         }
@@ -88,16 +76,17 @@ namespace com.egamesstudios.cell
             {
                 speed *= -1;
             }
-
-            RaycastHit2D hitInfo;
-            hitInfo = Physics2D.Raycast(transform.position, direction, shotLength, wallMask);
             damageMultiplier = chargeRate;
-            if (hitInfo) travelDistance = hitInfo.distance;
             hasShot = true;
         }
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
+            if(collision.gameObject.layer == 8 || collision.gameObject.layer == 12)
+            {
+                destroy = true;
+            }
+
             switch(collision.tag)
             {
                 case "Enemy":
@@ -111,7 +100,7 @@ namespace com.egamesstudios.cell
                 case "Switch":
                     if(!hitObjects.Contains(collision.gameObject))
                     {
-                        collision.gameObject.GetComponent<IGuitarSwitch>().TriggerSwitch();
+                        collision.gameObject.GetComponent<ASwitch>().TriggerSwitch(SwitchType.HITABLE, HitableSwitchType.GUN);
                     }
                     break;
             }

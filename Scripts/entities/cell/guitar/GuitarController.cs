@@ -123,9 +123,9 @@ namespace com.egamesstudios.cell
                                 break;
                             case "Switch":
 
-                                if (go.GetComponent<IGuitarSwitch>() != null)
+                                if (go.GetComponent<ASwitch>() != null)
                                 {
-                                    go.GetComponent<IGuitarSwitch>().TriggerSwitch();
+                                    go.GetComponent<ASwitch>().TriggerSwitch(SwitchType.HITABLE, HitableSwitchType.GUITAR);
                                 }
                                 break;
                             case "Projectile":

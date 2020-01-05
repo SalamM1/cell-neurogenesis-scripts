@@ -19,9 +19,9 @@ namespace com.egamesstudios.cell
         public RoomSaveData currentRoom;
         [FilePath]
         public string filePath;
-        [OdinSerialize]
+        [SerializeField]
         const string fileName = "/CellSave";
-        [OdinSerialize]
+        [SerializeField]
         private string fileExtension = ".neurodata";
         private int saveSlot;
         private Games[] gameList;

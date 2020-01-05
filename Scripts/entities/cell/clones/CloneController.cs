@@ -54,10 +54,9 @@ namespace com.egamesstudios.cell
 
             cloneMenu.gameObject.SetActive(false);
 
-            clones = new List<CellController>
-            {
-                mainCell
-            };
+            clones = new List<CellController>(6);
+            clones.Add(mainCell);
+            VariableContainer.variableContainer.cells = this.clones;
         }
 
         // Update is called once per frame
@@ -85,7 +84,7 @@ namespace com.egamesstudios.cell
                     CreateClone(cloneMenu.CreateClone());
                 }
             }
-            if(mainCell.vars.activeState == State.CONTROL && mainCell.vars.activeClones < 5 && mainCell.vars.maxHealth > 20)
+            if(mainCell.vars.activeState == State.CONTROL && mainCell.vars.activeClones < 5 && mainCell.vars.maxHealth >= 40)
             {
                 if (player.GetButtonDown("CreateClone"))
                 {
@@ -132,7 +131,7 @@ namespace com.egamesstudios.cell
         }
 
         /// <summary>
-        /// Sets player to cloning state and activates clone UI
+        /// Sets player to cloning state and activates clone menu UI
         /// </summary>
         private void EnterCloneMenu()
         {
@@ -141,7 +140,7 @@ namespace com.egamesstudios.cell
         }
 
         /// <summary>
-        /// Removes clone UI
+        /// Removes clone menu UI
         /// </summary>
         public void ExitCloneMenu()
         {
@@ -154,7 +153,6 @@ namespace com.egamesstudios.cell
         /// <param name="cellType">Type of clone selected from clone UI</param>
         private void CreateClone(CellType cellType)
         {
-            sfx.SetPitch(0.75f);
             sfx.PlaySFX(1);
 
             GameObject toInstantiate;
@@ -190,13 +188,13 @@ namespace com.egamesstudios.cell
 
             index = 1;
             clones.Insert(index, newCell);
-            VariableContainer.variableContainer.cells.Add(newCell);
 
             currentActive.ChangeState(State.INACTIVE);
             SetActiveAndCam(newCell);
             currentActive.vars.type = cellType;
             GivePowerups();
             currentActive.vars.isClone = true;
+            UIManager.uIManager.SyncClones();
         }
 
         /// <summary>
@@ -205,7 +203,6 @@ namespace com.egamesstudios.cell
         /// <param name="right">If true, indexes + 1, if false, indexes - 1</param>
         private void SwitchClone(bool right)
         {
-            sfx.SetPitch(1f);
             sfx.PlaySFX(0);
             index += right ? 1 : -1;
             if (index == clones.Count)
@@ -246,15 +243,14 @@ namespace com.egamesstudios.cell
         /// <param name="cloneToKill">The desired clone to yeet</param>
         private void DestroyShared(CellController cloneToKill)
         {
-            sfx.SetPitch(1.3f);
             sfx.PlaySFX(1);
             clones.Remove(cloneToKill);
-            VariableContainer.variableContainer.cells.Remove(currentActive);
             ReturnPowerups(cloneToKill);
             mainCell.vars.activeClones--;
             mainCell.vars.maxHealth += 20;
             mainCell.vars.mainHealth += cloneToKill.vars.isGateClone ? 20 : 0;
-            Destroy(cloneToKill.gameObject);
+            Destroy(cloneToKill.gameObject, 0.25f);
+            UIManager.uIManager.SyncClones();
         }
 
         /// <summary>
@@ -285,6 +281,7 @@ namespace com.egamesstudios.cell
             currentActive.gameObject.layer = 16;
             currentActive = cellToActive;
             currentActive.ChangeState(State.CONTROL);
+            UIManager.uIManager.SwitchToClone(index);
             VariableContainer.variableContainer.currentActive = currentActive;
         }
 

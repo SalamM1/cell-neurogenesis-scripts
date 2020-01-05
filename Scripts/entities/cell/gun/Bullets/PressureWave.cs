@@ -28,7 +28,7 @@ namespace com.egamesstudios.cell
                 case "Switch":
                     if (!hitObjects.Contains(collision.gameObject))
                     {
-                        collision.gameObject.GetComponent<IGuitarSwitch>().TriggerSwitch();
+                        collision.gameObject.GetComponent<ASwitch>().TriggerSwitch(SwitchType.HITABLE, HitableSwitchType.GUN);
                     }
                     break;
                 case "Block":

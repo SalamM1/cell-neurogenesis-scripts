@@ -12,6 +12,7 @@ namespace com.egamesstudios.cell
         [Required, SerializeField]
         GameObject windmillChildTemplate;
 
+#if UNITY_EDITOR
         public override void SetChildren()
         {
             for (int i = transform.childCount - 1; i >= 0; i--)
@@ -23,6 +24,7 @@ namespace com.egamesstudios.cell
             for(int i = fanCount; i > 0; i--)
             Instantiate(windmillChildTemplate, transform).transform.localScale = fanScale;
         }
+#endif
     }
 }
 

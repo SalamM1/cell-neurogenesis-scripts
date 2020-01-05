@@ -8,6 +8,7 @@ namespace com.egamesstudios.cell
     {
         protected bool inactive;
         public abstract void Trigger();
+        public abstract void SetState(bool state);
 
         public void SetPermanent()
         {
