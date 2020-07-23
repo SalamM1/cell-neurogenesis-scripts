@@ -100,7 +100,7 @@ namespace com.egamesstudios.cell
                 case "Switch":
                     if(!hitObjects.Contains(collision.gameObject))
                     {
-                        collision.gameObject.GetComponent<ASwitch>().TriggerSwitch(SwitchType.HITABLE, HitableSwitchType.GUN);
+                        collision.gameObject.GetComponent<ASwitch>().TriggerSwitch(SwitchType.HITABLE, HitableType.GUN);
                     }
                     break;
             }

@@ -22,12 +22,12 @@ namespace com.egamesstudios.cell
             anim = GetComponentInChildren<Animator>();
         }
 
-        protected override void TriggerSwitch(HitableSwitchType expectedHitType)
+        protected override void TriggerSwitch(HitableType expectedHitType)
         {
             if (index == 1)
             {
                 BoxCollider2D box = GetComponent<BoxCollider2D>();
-                foreach (RaycastHit2D hitInfo in Physics2D.BoxCastAll(box.bounds.center, box.bounds.extents, 0, Vector2.zero))
+                foreach (RaycastHit2D hitInfo in Physics2D.BoxCastAll(box.bounds.center, box.bounds.extents * 2, 0, Vector2.zero))
                 {
                     if ((hitInfo.transform.CompareTag("Cell") && weightType == WeightSwitchType.LIGHT) || hitInfo.transform.CompareTag("Block")) return;
                 }

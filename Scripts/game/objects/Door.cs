@@ -27,7 +27,7 @@ namespace com.egamesstudios.cell
             }
             bool vert = (direction == Direction.UP || direction == Direction.DOWN);
             GetComponent<BoxCollider2D>().size = vert ? new Vector2(1, size - 0.01f) : new Vector2(size, 0.99f);
-            float rotation = vert ? 0 : 90;
+            float rotation = vert ? 0 : -90;
             
             float totalSummon = size / 2;
 

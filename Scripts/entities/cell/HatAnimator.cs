@@ -9,6 +9,7 @@ namespace com.egamesstudios.cell
     public class HatAnimator : MonoBehaviour
     {
         private Animator cellAnim;
+        private SpriteRenderer spriteRenderer;
         private string previousState;
         private static string[] animationStates;
         private Vector3 originalPos;
@@ -17,8 +18,9 @@ namespace com.egamesstudios.cell
         void Start()
         {
             animationStates = new string[] { "Idle", "Move", "HitGround", "Jump", "Falling", "Die", "WallSlide", "WallJump", "WallCharge",
-            "GroundPound", "TakeHit", "FloorCharge"};
+            "GroundPound", "TakeHit", "FloorCharge", "Guitar", "Gun"};
             cellAnim = transform.parent.GetComponentInChildren<Animator>();
+            spriteRenderer = GetComponent<SpriteRenderer>();
             previousState = "";
             originalPos = transform.localPosition;
         }
@@ -31,6 +33,7 @@ namespace com.egamesstudios.cell
                 DOTween.Kill(transform);
                 transform.localPosition = originalPos;
                 transform.localRotation = Quaternion.identity;
+                transform.localScale = Vector3.one;
                 for (int i = 0; i < animationStates.Length; i++)
                 {
                     if (cellAnim.GetCurrentAnimatorStateInfo(0).IsName(animationStates[i]))
@@ -75,8 +78,18 @@ namespace com.egamesstudios.cell
                     break;
                 case "FloorCharge":
                     break;
+                case "Guitar":
+                case "Gun":
+                    transform.DOLocalMoveY(originalPos.y + 0.22f, 0.1f).SetLoops(2, LoopType.Yoyo).Play();
+                    transform.DOScale(new Vector3(1.25f, 1.25f, 1), 0.1f).SetLoops(2, LoopType.Yoyo).Play();
+                    break;
             }
             doOnce = true;
+        }
+
+        public void SetNewHat(HatContainer container)
+        {
+            this.spriteRenderer.sprite = container.hatImage;
         }
     }
 }

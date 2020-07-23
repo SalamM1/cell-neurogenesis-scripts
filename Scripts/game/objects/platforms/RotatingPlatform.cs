@@ -13,6 +13,7 @@ namespace com.egamesstudios.cell
         GameObject windmillChildTemplate;
 
 #if UNITY_EDITOR
+        [Button("Update Children")]
         public override void SetChildren()
         {
             for (int i = transform.childCount - 1; i >= 0; i--)

@@ -9,11 +9,12 @@ namespace com.egamesstudios.cell
     {
 
         [SerializeField]
-        private Sprite inactiveBox, activeBox, selectedBox, defaultPicture;
+        private CloneMenuContainer container;
         [SerializeField]
         private SpriteRenderer box, icon;
-        [SerializeField]
-        public CloneMenuContainer cloneDetails;
+
+        public CellType type;
+        public Sprite image;
 
         public bool canSelect;
         private bool selected;
@@ -21,7 +22,7 @@ namespace com.egamesstudios.cell
         // Use this for initialization
         void Start()
         {
-            icon.sprite = cloneDetails.image;
+            icon.sprite = image;
             canSelect = true;
             SetValidity(false);
         }
@@ -37,12 +38,14 @@ namespace com.egamesstudios.cell
 
         public void SelectActive()
         {
-            box.sprite = selectedBox;
+            box.sprite = canSelect ? container.selectedBox : container.selectedInvalidBox;
+            selected = true;
         }
 
         public void DeselectActive()
         {
-            box.sprite = activeBox;
+            box.sprite = canSelect ? container.activeBox : container.inactiveBox;
+            selected = false;
         }
 
         public void SetValidity(bool validity)
@@ -50,8 +53,8 @@ namespace com.egamesstudios.cell
             if(validity != canSelect)
             {
                 canSelect = validity;
-                box.sprite = validity ? activeBox : inactiveBox;
-                icon.sprite = validity ? cloneDetails.image : defaultPicture;
+                box.sprite = validity ? container.activeBox : container.inactiveBox;
+                icon.sprite = validity ? image : null; //container.defaultPicture;
             } 
         }
     }

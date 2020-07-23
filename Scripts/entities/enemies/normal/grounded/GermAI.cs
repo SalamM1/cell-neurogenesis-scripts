@@ -6,13 +6,16 @@ namespace com.egamesstudios.cell
 {
     [RequireComponent(typeof(CircleCollider2D))]
     public class GermAI : AEnemyAI {
-        [SerializeField]
-        private float jumpForce;
+
+        protected override void OnStart()
+        {
+            base.OnStart();
+        }
 
         protected override void WhileIdle()
         {
             rb.velocity = new Vector2(0, rb.velocity.y);
-            if (CellDetectionDistance() <= detectionRange)
+            if (CellDetectionDistance() <= enemyData.detectionRange)
             {
                 if(CastRayToCell())
                 {
@@ -28,17 +31,17 @@ namespace com.egamesstudios.cell
             if (timeToBeAware <= 0)
             {
                 UpdateAnimations("chase");
-                if (CellDetectionDistance() > detectionRange)
+                if (CellDetectionDistance() > enemyData.detectionRange)
                 {
                     ChangeState(EnemyState.IDLE);
                 }
                 else if (transform.position.x <= VariableContainer.variableContainer.currentActive.transform.position.x)
                 {
-                    rb.velocity = new Vector2(speed*awareSpeedFactor, rb.velocity.y);
+                    rb.velocity = new Vector2(speed * enemyData.awareSpeedFactor, rb.velocity.y);
                 }
                 else
                 {
-                    rb.velocity = new Vector2(-speed * awareSpeedFactor, rb.velocity.y);
+                    rb.velocity = new Vector2(-speed * enemyData.awareSpeedFactor, rb.velocity.y);
                 }
             }
 
@@ -58,7 +61,7 @@ namespace com.egamesstudios.cell
                     break;
                 case EnemyState.AWARE:
                     rb.velocity = new Vector2(0, rb.velocity.y);
-                    timeToBeAware = TIME_TO_BE_AWARE;
+                    timeToBeAware = enemyData.TIME_TO_BE_AWARE;
                     animator.ResetTrigger("chase");
                     break;
                 case EnemyState.ACTION:

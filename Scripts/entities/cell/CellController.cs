@@ -5,6 +5,7 @@ using com.egamesstudios.cell;
 using Rewired;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityScript.TypeSystem;
 
 namespace com.egamesstudios.cell
 {
@@ -135,6 +136,7 @@ namespace com.egamesstudios.cell
                         rb2d.velocity = new Vector2(0, rb2d.velocity.y);
                         break;
                     case State.TRANSITION:
+                        rb2d.velocity = Vector2.zero;
                         transform.Translate(move * Time.unscaledDeltaTime);
                         break;
                     default:
@@ -183,14 +185,33 @@ namespace com.egamesstudios.cell
         /// </summary>
         private void CheckGrounded()
         {
+
+            if (rb2d.velocity.y > 0.1)
+            {
+                vars.grounded = false;
+                return;
+            }
             vars.hitGround = false;
             RaycastHit2D hit = Physics2D.CircleCast(transform.position,
-                0.25f, new Vector2(0, -1), 0.57f, LayerMask.GetMask("Platform"));
+                0.2f, new Vector2(0, -1), 0.57f, LayerMask.GetMask("Platform"));
             if (!vars.grounded && hit.collider != null)
             {
                 vars.hitGround = true;
             }
-            vars.grounded = (hit.collider);
+
+            if(!hit.collider && vars.grounded)
+            {
+                if(vars.groundCheck <= 0)
+                {
+                    vars.grounded = false;
+                }
+                vars.groundCheck -= Time.deltaTime;
+            }
+            else if (hit.collider)
+            {
+                vars.grounded = vars.timeInAir >= 0.1f;
+                vars.groundCheck = 0.1f;
+            }
             
 
         }
@@ -245,7 +266,7 @@ namespace com.egamesstudios.cell
         {
             if (vars.chargeTime > 0)
             {
-                if (player.GetButton("Charge"))
+                if (player.GetButton("Charge") && !vars.isFalling)
                 {
                     rb2d.velocity = new Vector2(0, 0);
                     vars.chargeTime -= Time.deltaTime;
@@ -278,8 +299,12 @@ namespace com.egamesstudios.cell
             else if (!vars.isLaunched)
             {
                 rb2d.velocity = new Vector2(0, 0);
+                if (vars.isFalling)
+                {
+                    //ChangeState(State.CONTROL);
+                }
             }
-            if (vars.isLaunched)
+            else if (vars.isLaunched)
             {
                 if (vars.chargeTime > 0)
                 {
@@ -408,13 +433,17 @@ namespace com.egamesstudios.cell
                 }
                 if(vars.wallSliding)
                 {
-                    rb2d.velocity = new Vector2(rb2d.velocity.x, vars.wallSlideSpeed*vars.wallSlideSpeedModifier);
+                    rb2d.velocity = new Vector2(rb2d.velocity.x, vars.wallSlideSpeed*(vars.wallSlideSpeedModifier));
                 }
                 move.x = vars.movement;
                 move.y = rb2d.velocity.y;
             }
 
             rb2d.velocity = move;
+            if((rb2d.velocity.y < 0 && !vars.wallSliding) || (rb2d.velocity.y > 1 && vars.isJumping))
+            {
+                rb2d.velocity += Vector2.up * (Physics2D.gravity.y) * (vars.fallingModifier - 1) * Time.fixedDeltaTime; 
+            }
         }
 
         /// <summary>
@@ -422,8 +451,9 @@ namespace com.egamesstudios.cell
         /// </summary>
         private void CalculateJump()
         {
-            if(player.GetButtonDown("Jump") && !vars.wallSliding) {
-                if(vars.grounded && !vars.isKnocked)
+            if(player.GetButtonDown("Jump") && !vars.wallSliding) 
+            {
+                if(!vars.isKnocked && vars.grounded)
                 {
                     sfx.PlaySFX(1);
                     StartJump();
@@ -445,7 +475,6 @@ namespace com.egamesstudios.cell
                 if(vars.isJumping && !vars.isKnocked && (vars.timeInAir <= vars.jumpTime))
                 {
                     rb2d.velocity = new Vector2(vars.movement, vars.jumpForce);
-                    vars.timeInAir += Time.deltaTime;
                 }
             }
             if (player.GetButtonUp("Jump")) {
@@ -571,7 +600,10 @@ namespace com.egamesstudios.cell
             {
                 vars.isKnocked = false;
             }
-
+            if(vars.timeInAir <= vars.jumpTime)
+            {
+                vars.timeInAir += Time.deltaTime;
+            }
         }
 
         /// <summary>
@@ -821,6 +853,22 @@ namespace com.egamesstudios.cell
             move.x =  vars.speed * vars.movement*0.5f;
         }
 
+        //TODO other key types
+        public void AddKey(KeyType keyType)
+        {
+            vars.keyCount++;
+        }
+
+        public bool UseKey(KeyType keyType)
+        {
+            if (vars.keyCount <= 0) return false;
+            else
+            {
+                vars.keyCount--;
+                return true;
+            }
+        }
+
         #endregion
         #region State Transitions
         /// <summary>
@@ -870,6 +918,7 @@ namespace com.egamesstudios.cell
                     break;
                 case State.CHARGING:
                     vars.chargeTime = 1.0f;
+                    rb2d.velocity = Vector2.zero;
                     UpdateAnimations("charge");
                     break;
                 case State.GROUND_POUND:
@@ -889,7 +938,10 @@ namespace com.egamesstudios.cell
                     vars.movement = 0;
                     break;
                 case State.TRANSITION:
-                    rb2d.velocity = move;
+                    rb2d.velocity = Vector2.zero;
+                    break;
+                case State.DEAD:
+                    rb2d.velocity = Vector2.zero;
                     break;
                 default:
                     break;

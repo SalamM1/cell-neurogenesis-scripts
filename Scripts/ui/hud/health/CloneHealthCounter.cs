@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,7 +9,7 @@ namespace com.egamesstudios.cell
     public class CloneHealthCounter : MonoBehaviour
     {
         public Image hpBarMask;
-        public Text hpValue;
+        public TextMeshProUGUI hpValue;
 
         private HUDCloneIndicator indicator;
 

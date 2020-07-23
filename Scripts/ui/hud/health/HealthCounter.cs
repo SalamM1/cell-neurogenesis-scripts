@@ -12,11 +12,11 @@ namespace com.egamesstudios.cell
     {
         public Image hpBarMask;
         private Image hpBarTile;
-        public Text hpValue;
+        public TextMeshProUGUI hpValue;
 
         public Image epBarMask;
         private Image epBarTile;
-        public Text epValue;
+        public TextMeshProUGUI epValue;
 
         public Image hpBarBorder;
         public Image epBarBorder;

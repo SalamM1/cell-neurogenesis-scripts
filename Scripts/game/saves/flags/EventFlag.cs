@@ -43,6 +43,19 @@ namespace com.egamesstudios.cell
         {
             return flag;
         }
+
+#if UNITY_EDITOR
+        [Sirenix.OdinInspector.Button]
+        public void PrintFlagIDs()
+        {
+            Debug.ClearDeveloperConsole();
+            foreach (EventFlag compFlag in FindObjectsOfType<EventFlag>())
+            {
+                Debug.Log(compFlag.ID);
+            }
+        }
+
+#endif
     }
 }
 

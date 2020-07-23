@@ -73,7 +73,7 @@ namespace com.egamesstudios.cell
         void Update()
         {
             //increment cooldown timer and timer for ongoing attack
-            if (timer > 0) timer -= Time.deltaTime * (1 + cell.vars.swingSpeedModifier);
+            if (timer > 0) timer -= Time.deltaTime * (cell.vars.swingSpeedModifier);
             if (attacking) attackLength -= Time.deltaTime;
             if (attackLength <= 0)
             {
@@ -95,7 +95,7 @@ namespace com.egamesstudios.cell
                 }
 
                 //On release, do the attack
-                if (cell.player.GetButtonUp("Guitar"))
+                if (cell.player.GetButtonUp("Guitar") || cell.player.GetButtonDown("Guitar"))
                 {
                     if (timer <= 0)
                     {
@@ -125,11 +125,17 @@ namespace com.egamesstudios.cell
 
                                 if (go.GetComponent<ASwitch>() != null)
                                 {
-                                    go.GetComponent<ASwitch>().TriggerSwitch(SwitchType.HITABLE, HitableSwitchType.GUITAR);
+                                    go.GetComponent<ASwitch>().TriggerSwitch(SwitchType.HITABLE, HitableType.GUITAR);
                                 }
                                 break;
                             case "Projectile":
-                                // TODO: Handle Projectile Parrying
+                            // TODO: Handle Projectile Parrying
+                            case "Destructable":
+                                if (go.GetComponent<Destructable>() != null)
+                                {
+                                    go.GetComponent<Destructable>().Damage(HitableType.GUITAR, damage);
+                                }
+                                break;
                             default:
                                 break;
                         }

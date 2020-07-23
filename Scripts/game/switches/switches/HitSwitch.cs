@@ -14,7 +14,7 @@ namespace com.egamesstudios.cell
     public class HitSwitch : ASwitch
     {
         [BoxGroup("Hitable")]
-        public HitableSwitchType hitType;
+        public HitableType hitType;
         [BoxGroup("Hitable")]
         public float angle;
         [BoxGroup("Hitable")]
@@ -34,9 +34,9 @@ namespace com.egamesstudios.cell
             type = SwitchType.HITABLE;
         }
 
-        protected override void TriggerSwitch(HitableSwitchType expectedHitType)
+        protected override void TriggerSwitch(HitableType expectedHitType)
         {
-            if (hitType != HitableSwitchType.BOTH && hitType != expectedHitType) return;
+            if (hitType != HitableType.BOTH && hitType != expectedHitType) return;
 
             if (flag) flag.SetFlag(true);
             foreach (ASwitchEvent switchEvent in switchEvents[index].events)

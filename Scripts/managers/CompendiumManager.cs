@@ -22,5 +22,6 @@ namespace com.egamesstudios.cell
         GERM,
         VIRUS,
         BACTERIA,
+        PARASITE,
     }
 }

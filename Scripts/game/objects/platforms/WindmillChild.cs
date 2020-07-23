@@ -25,9 +25,11 @@ namespace com.egamesstudios.cell
 
             foreach (Transform target in targets)
             {
-                //target.position += offset;
-                target.Translate(offset);
+                if (target != null)
+                    target.Translate(offset);
             }
+
+            targets.RemoveAll(target => target == null);
         }
     }
 }

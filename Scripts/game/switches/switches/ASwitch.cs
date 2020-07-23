@@ -12,7 +12,7 @@ namespace com.egamesstudios.cell
         {
             public ASwitchEvent[] events;
         }
-
+        [SerializeField]
         protected SwitchType type;
         protected SwitchFlag flag;
 
@@ -44,7 +44,7 @@ namespace com.egamesstudios.cell
             }
         }
 
-        public void TriggerSwitch(SwitchType expectedType, HitableSwitchType expectedHitType = HitableSwitchType.BOTH)
+        public void TriggerSwitch(SwitchType expectedType, HitableType expectedHitType = HitableType.BOTH)
         {
             //Check if correct switch and if its active
             if (expectedType != type) return;
@@ -66,7 +66,7 @@ namespace com.egamesstudios.cell
 
         }
 
-        protected abstract void TriggerSwitch(HitableSwitchType expectedHitType);
+        protected abstract void TriggerSwitch(HitableType expectedHitType);
 
 #if UNITY_EDITOR
         private bool ValidateStateValue(int value)
@@ -82,8 +82,8 @@ namespace com.egamesstudios.cell
         {
             switchEvents = new SwitchEventArrayWrapper[numOfStates];
         }
-    }
 #endif
+    }
 
     public enum SwitchType
     {
@@ -97,7 +97,7 @@ namespace com.egamesstudios.cell
         LIGHT, HEAVY
     }
 
-    public enum HitableSwitchType
+    public enum HitableType
     {
         GUN, GUITAR, BOTH
     }

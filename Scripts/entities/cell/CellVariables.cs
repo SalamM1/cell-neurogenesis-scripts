@@ -67,14 +67,16 @@ namespace com.egamesstudios.cell
         public bool isDead;
 
         [FoldoutGroup("Jumping")]
-        public bool canDoubleJump;
+        public float groundCheck;
         [FoldoutGroup("Jumping")]
-        public bool canTripleJump;
+        public bool canDoubleJump, canTripleJump;
         [FoldoutGroup("Cloning", 12)]
         [FoldoutGroup("Physics State")]
         public bool isClone, isGateClone, isOnGate;
         [FoldoutGroup("Cloning")]
         public Transform gateLocation;
+        [FoldoutGroup("Cloning")]
+        public bool[] allowedClones;
 
         [FoldoutGroup("Jumping")]
         [FoldoutGroup("Powerups")]
@@ -119,6 +121,8 @@ namespace com.egamesstudios.cell
         public float swingSpeedModifier = 0;
         [FoldoutGroup("Speed Modifiers")]
         public float pushbackModifier;
+        [FoldoutGroup("Speed Modifiers")]
+        public float fallingModifier;
 
         [FoldoutGroup("Jumping", 5)]
         public float jumpTime;
@@ -151,6 +155,8 @@ namespace com.egamesstudios.cell
 
         [FoldoutGroup("General")]
         public Vector3 checkpoint;
+        [FoldoutGroup("General")]
+        public int keyCount;
 
         [FoldoutGroup("Combat")]
         public int guitarDamage, gunDamage;

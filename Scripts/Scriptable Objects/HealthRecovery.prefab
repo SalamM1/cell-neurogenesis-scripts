@@ -142,7 +142,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sfxClips:
   - {fileID: 8300000, guid: fc2d141d1f8586047bbcc233ef86cb90, type: 3}
-  mixer: {fileID: 24300002, guid: 9c0c1a8aecaa18d44a105e46f8d58cd1, type: 2}
+  mixer: {fileID: 243078177777919786, guid: 66c4ad00297b5194e954a6f978b07736, type: 2}
 --- !u!1 &4629568090878516580
 GameObject:
   m_ObjectHideFlags: 0

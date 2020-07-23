@@ -64,7 +64,7 @@ namespace com.egamesstudios.cell
                     // TODO: Add color and particle updater, add sounds
                 }
 
-                if (cell.player.GetButtonUp("Gun"))
+                if (cell.player.GetButtonUp("Gun") || cell.player.GetButtonDown("Gun"))
                 {
                     chargeMultiplier++;
                     cell.UpdateAnimations("attack");

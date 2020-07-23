@@ -11,7 +11,14 @@ namespace com.egamesstudios.cell {
         public float travelTime;
         public float holdTime;
 
-        [PropertyRange(-5,5)]
+        [PropertyRange(0,5)]
         public float zoom;
+
+        private void Reset()
+        {
+            cameraPoint = transform;
+            travelTime = 0.25f;
+            holdTime = 2f;
+        }
     }
 }

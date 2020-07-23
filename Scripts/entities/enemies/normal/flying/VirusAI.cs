@@ -6,9 +6,6 @@ namespace com.egamesstudios.cell
 {
     public class VirusAI : FlyingAI
     {
-        [SerializeField]
-        private GameObject projectile;
-        private Vector2 chargeSpeed;
 
         protected override void WhileDead()
         {
@@ -24,16 +21,16 @@ namespace com.egamesstudios.cell
                 //Melee
                 if (attackID == 0)
                 {
-                    if(!castingAttack) chargeSpeed = (VariableContainer.variableContainer.currentActive.transform.position - transform.position).normalized * speed * 1.75f;
+                    if(!castingAttack) cellDirection = (VariableContainer.variableContainer.currentActive.transform.position - transform.position).normalized;
                     castingAttack = true;
-                    rb.velocity = chargeSpeed;
+                    rb.velocity = ((VirusData) enemyData).chargeSpeed*cellDirection;
                 }
                 //Ranged
                 else
                 {
                     GetComponent<SFXPlayer>().PlaySFX(1, 0.6f, 3f);
-                    var proj = Instantiate<GameObject>(projectile, transform.position, Quaternion.Euler((VariableContainer.variableContainer.currentActive.transform.position - transform.position).normalized));
-                    proj.GetComponent<Projectile>().Shoot(this, (VariableContainer.variableContainer.currentActive.transform.position - transform.position).normalized, attackDamage);
+                    var proj = Instantiate<GameObject>(((VirusData)enemyData).projectile, transform.position, Quaternion.Euler((VariableContainer.variableContainer.currentActive.transform.position - transform.position).normalized));
+                    proj.GetComponent<Projectile>().Shoot(this, (VariableContainer.variableContainer.currentActive.transform.position - transform.position).normalized, enemyData.attackDamage);
                     ChangeState(EnemyState.IDLE);
                 }
             }

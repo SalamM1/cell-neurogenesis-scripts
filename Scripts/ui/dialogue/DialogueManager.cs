@@ -19,8 +19,8 @@ namespace com.egamesstudios.cell
     public class DialogueManager : MonoBehaviour
     {
 
-        public Text nameText;
-        public Text dialogueText;
+        public TextMeshProUGUI nameText;
+        public TextMeshProUGUI dialogueText;
         [HideInInspector]
         public bool isTriggered;
         [SerializeField, EnumToggleButtons]
@@ -39,6 +39,7 @@ namespace com.egamesstudios.cell
         private Coroutine cutsceneTextBox;
         private Coroutine textTyping;
 
+        private DialogueTrigger currentDialogueTarget;
 
         void Awake()
         {
@@ -68,11 +69,12 @@ namespace com.egamesstudios.cell
             }
         }
 
-        internal void StartDialogue(Dialogue dialogue)
+        internal void StartDialogue(Dialogue dialogue, DialogueTrigger dialogueTrigger)
         {
+            
             sentences.Clear();
             UIManager.uIManager.ChangeState(UIState.DIALOGUE);
-            VariableContainer.variableContainer.currentActive.ChangeState(State.DIALOGUE);
+            currentDialogueTarget = dialogueTrigger;
             isTriggered = true;
             nameText.text = loadedDialogue[dialogue.id][0];
 
@@ -81,16 +83,18 @@ namespace com.egamesstudios.cell
                 sentences.Enqueue(loadedDialogue[dialogue.id][i]);
             }
 
-            DisplayNextSentence();
+            DisplayNextSentence(dialogueTrigger);
         }
 
-        public bool DisplayNextSentence()
+        public bool DisplayNextSentence(DialogueTrigger dialogueTrigger)
         {
+            if (!isTriggered || dialogueTrigger != currentDialogueTarget)
+                return false;
             sfx.PlaySFX(0);
             if (sentences.Count == 0)
             {
                 EndDialogue();
-                return true;
+                return false;
             }
 
             if (textTyping != null)
@@ -99,18 +103,27 @@ namespace com.egamesstudios.cell
                 textTyping = null;
             }
             textTyping = StartCoroutine(TypeSentence(sentences.Dequeue()));
-            return false;
+            return true;
         }
-        void EndDialogue()
+
+        public void EndDialogue()
         {
             StopAllCoroutines();
             dialogueText.text = "";
             nameText.text = "";
+            ExitState();
+
+            if(UIManager.uIManager.state == UIState.DIALOGUE)
+            {
+                UIManager.uIManager.ChangeState(UIState.INGAME);
+            }
+        }
+
+        public void ExitState()
+        {
+            sentences.Clear();
             isTriggered = false;
-
-            VariableContainer.variableContainer.currentActive.ChangeState(State.CONTROL);
-
-            UIManager.uIManager.ChangeState(UIState.INGAME);
+            currentDialogueTarget = null;
         }
 
         internal void SetCutsceneDialogue(int dialogueID, string cutsceneName)
@@ -161,6 +174,11 @@ namespace com.egamesstudios.cell
             isTriggered = false;
         }
 
+        public bool CompareCurrentDialogue(DialogueTrigger dialogueTrigger)
+        {
+            return dialogueTrigger == currentDialogueTarget;
+        }
+
         IEnumerator TypeSentence(string s)
         {
             dialogueText.text = "";
@@ -174,7 +192,5 @@ namespace com.egamesstudios.cell
         {
             nameText.text = dialogueText.text = "";
         }
-
     }
-
 }

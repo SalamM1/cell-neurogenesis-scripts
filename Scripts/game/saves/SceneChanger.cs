@@ -20,7 +20,7 @@ namespace com.egamesstudios.cell
             if (collision.tag.Equals("Cell") && !CameraManager.cameraManager.DEBUG)
             {
                 StartCoroutine(LoadSceneManager.loadSceneManager.LoadLevel(ID, connectedScene));
-                collision.GetComponent<CellController>().SetTransitionSpeed(direction.GetVector());
+                collision.GetComponent<CellController>().SetTransitionSpeed(direction.GetVector() * 0.5f);
             }
         }
     }

@@ -59,7 +59,7 @@ namespace com.egamesstudios.cell
             SaveManager.saveManager.SaveGame();
             this.checkpointID = checkpointID;
             SaveManager.saveManager.OnSceneChange(connectedScene);
-            yield return new WaitForSecondsRealtime(1.75f);
+            yield return new WaitForSecondsRealtime(UIManager.uIManager.fadeTime + 0.1f);
 
             SceneManager.LoadScene(connectedScene);
         }

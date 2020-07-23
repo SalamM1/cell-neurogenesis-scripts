@@ -1,38 +1,45 @@
-﻿using Rewired;
+﻿using DG.Tweening;
+using Rewired;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace com.egamesstudios.cell
 {
+    [RequireComponent(typeof(ScaleInOut))]
     public class CloneMenu : MonoBehaviour
     {
         Player player;
-        float x, y, angle;
+        bool xr, xl, yu, yd;
         int newSelection, currentSelection;
 
         [SerializeField]
         private CloneMenuBox[] cloneBoxes = new CloneMenuBox[6];
+        [SerializeField]
+        private GameObject selectionOutline;
+        
+        private SFXPlayer sfxPlayer;
         // Use this for initialization
         void Start()
         {
             player = ReInput.players.GetPlayer(0);
+            sfxPlayer = GetComponent<SFXPlayer>();
             currentSelection = 0;
-                        cloneBoxes[currentSelection].SelectActive();
         }
 
         // Update is called once per frame
         void LateUpdate()
         {
+            cloneBoxes[currentSelection].SelectActive();
             if (gameObject.activeInHierarchy)
             {
                 if (VariableContainer.variableContainer.mainCell.transform.localScale.x < 0)
                 {
-                    this.transform.localScale = new Vector3(-1.5f, 1.5f, 1);
+                    //this.transform.localScale = new Vector3(-1f, 1f, 1);
                 }
                 else
                 {
-                    this.transform.localScale = new Vector3(1.5f, 1.5f, 1);
+                    //this.transform.localScale = new Vector3(1f, 1f, 1);
                 }
 
                 UpdateBoxValidity();
@@ -40,56 +47,72 @@ namespace com.egamesstudios.cell
             }
         }
 
+        public void EnableMenu(bool enable)
+        {
+            if (enable)
+            {
+                gameObject.SetActive(true);
+                transform.localScale = Vector3.forward;
+            }
+
+            StopAllCoroutines();
+            GetComponent<ScaleInOut>().SetX(VariableContainer.variableContainer.mainCell.transform.localScale.x < 0 ? -1 : 1);
+            StartCoroutine(GetComponent<ScaleInOut>().Scale(enable, true));
+        }
+
         void UpdateBoxValidity()
         {
             CellVariables vars = VariableContainer.variableContainer.mainCell.vars;
-            cloneBoxes[0].SetValidity(true);
-            cloneBoxes[1].SetValidity(vars.hasDoubleJump || vars.hasWallJump);
-            cloneBoxes[2].SetValidity(vars.hasGuitar);
-            cloneBoxes[3].SetValidity(vars.hasGun);
-            cloneBoxes[4].SetValidity(vars.hasSlingJump || vars.hasChargeDash);
-            cloneBoxes[5].SetValidity(vars.hasGroundPound);
+            cloneBoxes[0].SetValidity(vars.allowedClones[0]);
+            cloneBoxes[1].SetValidity((vars.hasDoubleJump || vars.hasWallJump) && vars.allowedClones[1]);
+            cloneBoxes[2].SetValidity(vars.hasGuitar && vars.allowedClones[2]);
+            cloneBoxes[3].SetValidity(vars.hasGun && vars.allowedClones[3] );
+            cloneBoxes[4].SetValidity((vars.hasSlingJump || vars.hasChargeDash) && vars.allowedClones[4]);
+            cloneBoxes[5].SetValidity(vars.hasGroundPound && vars.allowedClones[5]);
         }
 
         void ScanInput()
         {
-            x = player.GetAxis("Camera X");
-            y = player.GetAxis("Camera Y");
-            angle = ((Mathf.Atan2(y, x)*Mathf.Rad2Deg)) + 30;
-            if (angle <= -135 || angle >= 195) newSelection = 3; //D
-            else if (angle >= 135 && angle <= 165) newSelection = 2; //C
-            else if (angle >= 75 && angle <= 105) newSelection = 1; //B
-            else if (angle >= 15 && angle <= 45) newSelection = 0; //A
-            else if (angle >= -45 && angle <= -15) newSelection = 5; //F
-            else if (angle >= -105 && angle <= -75) newSelection = 4; //E
-            else newSelection = currentSelection;
+
+            xr = player.GetButtonDown("Camera X");
+            yu = player.GetButtonDown("Camera Y");
+            xl = player.GetNegativeButtonDown("Camera X");
+            yd = player.GetNegativeButtonDown("Camera Y");
+
+            if (xr || xl)
+            {
+                newSelection = currentSelection + 3;
+            }
+            else if (yu || yd)
+            {
+                if (currentSelection == 0 || currentSelection == 3) newSelection = currentSelection + (yd ? +1 : +2);
+                else if (currentSelection == 2 || currentSelection == 5) newSelection = currentSelection + (yd ? -2 : -1);
+                else newSelection = currentSelection + (yd ? +1 : -1);
+            }
+            newSelection %= 6;
 
             if (newSelection != currentSelection)
             {
                 CloneMenuBox oldSelect = cloneBoxes[currentSelection];
                 CloneMenuBox newSelect = cloneBoxes[newSelection];
-                if (newSelect.canSelect && oldSelect.canSelect)
-                {
-                    currentSelection = newSelection;
-                    newSelect.SelectActive();
-                    oldSelect.DeselectActive();
-                }
-            }
-            if(currentSelection == 0)
-            {
-                cloneBoxes[0].SelectActive();
+                currentSelection = newSelection;
+
+                selectionOutline.transform.DOLocalMove(newSelect.transform.localPosition, 0.15f);
+                sfxPlayer.PlaySFX(0, 1, 1);
+
+                newSelect.SelectActive();
+                oldSelect.DeselectActive();
             }
         }
 
         public CellType CreateClone()
         {
-            if(currentSelection > 5)
-            {
-                currentSelection = 0;
-            }
-            int val = currentSelection;
-            currentSelection = 0;
-            return cloneBoxes[val].cloneDetails.type;
+            return cloneBoxes[currentSelection].type;
+        }
+
+        public bool CanSelectClone()
+        {
+            return cloneBoxes[currentSelection].canSelect;
         }
     }
 }

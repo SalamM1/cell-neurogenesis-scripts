@@ -7,29 +7,20 @@ namespace com.egamesstudios.cell
 {
     public class FlyingAI : AEnemyAI
     {
-        [SerializeField]
-        [FoldoutGroup("Flying")]
-        protected float hoverDistance;
-        [SerializeField]
-        [FoldoutGroup("Flying")]
-        protected float timeToLoseChase, hoverScalingRate;
-        protected float TIME_TO_LOSE_CHASE, RANDOM_MOVE_TIMER, randomMoveTimer, hoverShortFactor;
+        protected float scaling;
         protected Vector2 cellDirection, randomMoveSpeed;
         protected bool hoverRangeScaled;
 
         protected override void OnStart()
         {
             rb.gravityScale = 0;
-            hoverShortFactor = 0.18f*hoverDistance;
-            TIME_TO_LOSE_CHASE = timeToLoseChase;
-            RANDOM_MOVE_TIMER = 1;
-            randomMoveTimer = 0;
+            scaling = 1;
         }
 
         protected override void WhileIdle()
         {
             rb.velocity = Vector2.zero;
-            if (CellDetectionDistance() <= detectionRange)
+            if (CellDetectionDistance() <= enemyData.detectionRange)
             {
                 if (CastRayToCell())
                 {
@@ -44,8 +35,8 @@ namespace com.egamesstudios.cell
             {
                 if(timeBetweenAttacks <= 0)
                 {
-                    timeBetweenAttacks = TIME_BETWEEN_ATTACKS;
-                    if (CellDistance() <= hoverDistance && CellDistance() >= hoverDistance * hoverShortFactor && Random.Range(0.0f, 1.0f) >= 0.6f)
+                    timeBetweenAttacks = enemyData.TIME_BETWEEN_ATTACKS;
+                    if (CellDistance() <= ((FlyingData)enemyData).hoverDistance * scaling && CellDistance() >= ((FlyingData)enemyData).hoverDistance * scaling * 0.5f && Random.Range(0.0f, 1.0f) >= 0.6f)
                     {
                         attackID = 0;
                     }
@@ -60,17 +51,17 @@ namespace com.egamesstudios.cell
                     timeBetweenAttacks -= Time.deltaTime;
                     if (CastRayToCell())
                     {
-                        if (CellDistance() <= hoverDistance && CellDistance() >= hoverDistance * hoverShortFactor)
+                        if (CellDistance() <= ((FlyingData)enemyData).hoverDistance * scaling && CellDistance() >= ((FlyingData)enemyData).hoverDistance * scaling * 0.5f)
                         {
                             if (!hoverRangeScaled)
                             {
-                                hoverDistance *= hoverScalingRate;
+                                scaling = ((FlyingData)enemyData).hoverScaling;
                                 hoverRangeScaled = true;
                             }
                             if (randomMoveTimer <= 0)
                             {
-                                randomMoveSpeed = (new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f))) * speed * 0.1f;
-                                randomMoveTimer = RANDOM_MOVE_TIMER;
+                                randomMoveSpeed = (new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f))) * enemyData.speed * 0.1f;
+                                randomMoveTimer = enemyData.RANDOM_MOVE_TIMER;
                             }
                             else
                             {
@@ -82,11 +73,11 @@ namespace com.egamesstudios.cell
                         {
                             if (hoverRangeScaled)
                             {
-                                hoverDistance /= hoverScalingRate;
+                                scaling = 1;
                                 hoverRangeScaled = false;
                             }
                             cellDirection = (GetHoverPoint(true, true) - transform.position).normalized;
-                            rb.velocity = cellDirection * speed;
+                            rb.velocity = cellDirection * enemyData.speed;
                         }
                     }
                     else
@@ -97,7 +88,7 @@ namespace com.egamesstudios.cell
                         }
                         else
                         {
-                            rb.velocity = cellDirection * speed;
+                            rb.velocity = cellDirection * enemyData.speed;
                             timeToLoseChase -= Time.deltaTime;
                         }
                     }
@@ -116,14 +107,14 @@ namespace com.egamesstudios.cell
                 case EnemyState.IDLE:
                     break;
                 case EnemyState.AWARE:
-                    timeToBeAware = TIME_TO_BE_AWARE;
-                    timeToLoseChase = TIME_TO_LOSE_CHASE;
+                    timeToBeAware = enemyData.TIME_TO_BE_AWARE;
+                    timeToLoseChase = enemyData.TIME_TO_LOSE_CHASE;
                     rb.velocity = Vector2.zero;
                     animator.ResetTrigger("chase");
                     break;
                 case EnemyState.ACTION:
                     castingAttack = false;
-                    timeToAttack = TIME_TO_ATTACK;
+                    timeToAttack = enemyData.TIME_TO_ATTACK;
                     rb.velocity = Vector2.zero;
                     animator.ResetTrigger("attackFinish");
                     break;
@@ -144,9 +135,9 @@ namespace com.egamesstudios.cell
             {
                 direction = (VariableContainer.variableContainer.currentActive.transform.position.x - transform.position.x > 0 ? new Vector3(-0.5f, 0.866f, 0) : new Vector3(0.5f, 0.866f, 0));
             }
-            RaycastHit2D hitInfo = Physics2D.Raycast(VariableContainer.variableContainer.currentActive.transform.position, direction, hoverDistance, LayerMask.GetMask("Platform", "MovingPlatform"));
+            RaycastHit2D hitInfo = Physics2D.Raycast(VariableContainer.variableContainer.currentActive.transform.position, direction, ((FlyingData)enemyData).hoverDistance * scaling, LayerMask.GetMask("Platform", "MovingPlatform"));
             if (hitInfo) return hitInfo.point;
-            return VariableContainer.variableContainer.currentActive.transform.position + direction * hoverDistance;
+            return VariableContainer.variableContainer.currentActive.transform.position + (direction * ((FlyingData)enemyData).hoverDistance * scaling);
         }
 
         protected override void OnCollisionEnter2D(Collision2D collision)

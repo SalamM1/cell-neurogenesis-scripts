@@ -9,11 +9,16 @@ namespace com.egamesstudios.cell
         // Start is called before the first frame update
 
         private Vector3 previousPos;
+
         void Start()
         {
             previousPos = transform.position;
         }
 
+        private void Update()
+        {
+
+        }
         // Update is called once per frame
         void FixedUpdate()
         {
@@ -27,9 +32,9 @@ namespace com.egamesstudios.cell
 
         private void OnCollisionStay2D(Collision2D collision)
         {
-            if(collision.contacts.Length > 0)
+            if(collision.contactCount > 0)
             {
-                ContactPoint2D contact = collision.contacts[0];
+                ContactPoint2D contact = collision.GetContact(0);
                 if (Vector2.Dot(contact.normal, Vector2.up) > 0.5f)
                 {
                     if (collision.gameObject.GetComponent<CellController>() && collision.gameObject.GetComponent<CellController>().vars.grounded)

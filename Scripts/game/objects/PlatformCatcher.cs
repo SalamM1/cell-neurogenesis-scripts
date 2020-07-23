@@ -18,9 +18,22 @@ namespace com.egamesstudios.cell
         {
             targets.Clear();
         }
-        void OnTriggerEnter2D(Collider2D col)
+        void OnTriggerStay2D(Collider2D col)
         {
-            if (!targets.Contains(col.transform) && (col.tag.Equals("Cell") || col.tag.Equals("Enemy") || col.tag.Equals("NPC") || col.tag.Equals("Block"))) targets.Add(col.transform);
+            if (!targets.Contains(col.transform) && (col.tag.Equals("Cell") || col.tag.Equals("Enemy") || col.tag.Equals("NPC") || col.tag.Equals("Block")))
+            {
+                if (col.GetComponent<CellController>())
+                {
+                    if (col.GetComponent<CellController>().vars.grounded || col.GetComponent<CellController>().vars.isFalling)
+                    {
+                        targets.Add(col.transform);
+                    }
+                }
+                else
+                {
+                    targets.Add(col.transform);
+                }
+            }
         }
         void OnTriggerExit2D(Collider2D col)
         {

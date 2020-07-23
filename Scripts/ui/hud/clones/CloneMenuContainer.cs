@@ -9,8 +9,6 @@ namespace com.egamesstudios.cell
     [CreateAssetMenu(fileName = "New CloneBox", menuName = "Custom/CloneBox")]
     public class CloneMenuContainer : ScriptableObject
     {
-        public CellType type;
-        [InlineEditor]
-        public Sprite image;
+        public Sprite inactiveBox, activeBox, selectedBox, selectedInvalidBox, defaultPicture;
     }
 }

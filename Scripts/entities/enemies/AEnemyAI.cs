@@ -16,41 +16,32 @@ namespace com.egamesstudios.cell
      */
     public abstract class AEnemyAI : MonoBehaviour
     {
+        [SerializeField, InlineEditor]
+        protected AEnemyData enemyData;
+
         [FoldoutGroup("State")]
         protected bool alive;
         [FoldoutGroup("State"), SerializeField]
-        protected bool canThaw, canBeKnockbacked, isKnocked, castingAttack;
+        protected bool isKnocked, castingAttack;
         [FoldoutGroup("Data"), SerializeField]
-        protected int enemyID, attackID, health, contactDamage, attackDamage;
-        [FoldoutGroup("Data"), SerializeField]
-        protected float speed, detectionRange, awareSpeedFactor;
-        [FoldoutGroup("Timers"), SerializeField]
-        protected float timeBetweenAttacks, timeToThaw, timeToStun, timeToBeAware, timeToBeIdle, timeToKnockback, timeToAttack;
-        protected float TIME_BETWEEN_ATTACKS;
-        protected float TIME_TO_THAW;
-        protected float TIME_TO_STUN;
-        protected float TIME_TO_BE_AWARE;
-        protected float TIME_TO_BE_IDLE;
-        protected float TIME_TO_KNOCKBACK;
-        protected float TIME_TO_ATTACK;
+        protected int enemyID, attackID, health;
+
+        [FoldoutGroup("Timers")]
+        protected float timeBetweenAttacks, timeToThaw, timeToStun, timeToBeAware, timeToBeIdle, timeToKnockback, timeToAttack, timeToLoseChase, randomMoveTimer;
+        protected float speed;
 
         [HideInInspector]
         public Vector3 originalPosition;
-        [SerializeField]
-        private EnemyType enemyType;
-        private LayerMask layerMask;
+        private static LayerMask layerMask;
 
         protected Animator animator;
         protected Rigidbody2D rb;
 
-        [SerializeField]
-        [FoldoutGroup("Data")]
-        protected DropTable dropTable;
         private static HashSet<State> validChaseStates;
 
         [SerializeField]
         [FoldoutGroup("State")]
-        protected float knockbackForce, knockbackMultiplier;
+        protected float knockbackMultiplier;
         [ShowInInspector]
         private EnemyState state;
 
@@ -61,7 +52,10 @@ namespace com.egamesstudios.cell
             {
                 validChaseStates = new HashSet<State>() { State.CONTROL, State.GROUND_POUND, State.CLONING, State.CHARGING };
             }
-            if(SaveManager.saveManager.currentRoom && !SaveManager.saveManager.currentRoom[1,enemyID])
+
+            layerMask = ~LayerMask.GetMask("Enemy", "NPC", "Clone", "Default", "Collectable", "Switch");
+
+            if (SaveManager.saveManager.currentRoom && !SaveManager.saveManager.currentRoom[1,enemyID])
             {
                 SetStats();
             }  
@@ -75,13 +69,16 @@ namespace com.egamesstudios.cell
         void Start()
         {
             this.originalPosition = transform.position;
-            TIME_BETWEEN_ATTACKS = timeBetweenAttacks;
-            TIME_TO_STUN = timeToStun;
-            TIME_TO_THAW = timeToThaw;
-            TIME_TO_BE_AWARE = timeToBeAware;
-            TIME_TO_BE_IDLE = timeToBeIdle;
-            TIME_TO_KNOCKBACK = timeToKnockback;
-            TIME_TO_ATTACK = timeToAttack;
+            speed = enemyData.speed;
+            timeBetweenAttacks = enemyData.TIME_BETWEEN_ATTACKS;
+            timeToStun = enemyData.TIME_TO_STUN;
+            timeToThaw = enemyData.TIME_TO_THAW;
+            timeToBeAware = enemyData.TIME_TO_BE_AWARE;
+            timeToBeIdle = enemyData.TIME_TO_BE_IDLE;
+            timeToKnockback = enemyData.TIME_TO_KNOCKBACK;
+            timeToAttack = enemyData.TIME_TO_ATTACK;
+            timeToLoseChase = enemyData.TIME_TO_LOSE_CHASE;
+            randomMoveTimer = 0;
             OnStart();
         }
 
@@ -125,6 +122,8 @@ namespace com.egamesstudios.cell
 
         private void FixedUpdate()
         {
+            transform.GetChild(0).transform.localScale = speed <= 0 ? new Vector3(-1, 1, 1) : Vector3.one;
+
             if (isKnocked)
             {
                 if (timeToKnockback < 0)
@@ -140,7 +139,7 @@ namespace com.egamesstudios.cell
                 else
                 {
 
-                    rb.velocity = Vector2.right * knockbackForce * knockbackMultiplier;
+                    rb.velocity = Vector2.right * enemyData.knockbackForce * knockbackMultiplier;
                     timeToKnockback -= Time.fixedDeltaTime;
                 }
             }
@@ -148,6 +147,16 @@ namespace com.egamesstudios.cell
 
         #region Update Methods
         protected virtual void OnStart()
+        {
+
+        }
+
+        protected virtual void OnDamage()
+        {
+
+        }
+
+        protected virtual void OnCollisionWithCell()
         {
 
         }
@@ -190,10 +199,10 @@ namespace com.egamesstudios.cell
         protected virtual void SetStats()
         {
             state = EnemyState.IDLE;
+            health = enemyData.maxHealth;
             rb = GetComponent<Rigidbody2D>();
             alive = true;
             isKnocked = false;
-            layerMask = ~LayerMask.GetMask("Enemy", "NPC", "Clone", "Default", "Collectable", "Switch");
             animator = GetComponentInChildren<Animator>();
             knockbackMultiplier = 1;
         }
@@ -229,7 +238,7 @@ namespace com.egamesstudios.cell
                     DropItems();
                     UpdateAnimations("dead");
                     alive = false;
-                    SaveManager.saveManager.currentRoom[1,enemyID] = SaveManager.saveManager.activeGame.compendiumFlags[1][(int)enemyType] = true;
+                    SaveManager.saveManager.currentRoom[1,enemyID] = SaveManager.saveManager.activeGame.compendiumFlags[1][(int)enemyData.enemyType] = true;
                     break;
             }
             state = newState;
@@ -259,7 +268,7 @@ namespace com.egamesstudios.cell
 
         protected bool CastRayToCell()
         {
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, VariableContainer.variableContainer.currentActive.transform.position - transform.position, detectionRange, layerMask);
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, VariableContainer.variableContainer.currentActive.transform.position - transform.position, enemyData.detectionRange, layerMask);
             if(hit) return hit.collider.gameObject.layer == 13 || hit.collider.gameObject.layer == 14;
             return false;
         }
@@ -278,6 +287,10 @@ namespace com.egamesstudios.cell
             {
                 ChangeState(EnemyState.DEAD);
             }
+            else
+            {
+                OnDamage();
+            }
         }
 
         public void Damage(int damage, Transform source)
@@ -295,7 +308,7 @@ namespace com.egamesstudios.cell
 
         public void Knockback(Transform source)
         {
-            if(canBeKnockbacked)
+            if(enemyData.canBeKnockbacked)
             {
                 float t = source.position.x - transform.position.x;
                 t = t > 0 ? -1 : 1;
@@ -303,9 +316,9 @@ namespace com.egamesstudios.cell
                 {
                     spr.color = new Color(1, 0, 1);
                 }
-                knockbackForce = Mathf.Abs(knockbackForce) * t;
+                knockbackMultiplier *= t;
                 isKnocked = true;
-                timeToKnockback = TIME_TO_KNOCKBACK;
+                timeToKnockback = enemyData.TIME_TO_KNOCKBACK;
             }
         }
 
@@ -319,13 +332,24 @@ namespace com.egamesstudios.cell
         {
             Vector3 randomVec;
 
-            foreach (GameObject pickup in dropTable.pickups)
+            foreach (ObjectAndValue pickup in enemyData.dropTable.pickups)
             {
-                if (pickup)
+                if (pickup != null)
                 {
-                    randomVec = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), 0) * 0.75f;
-                    Instantiate(pickup, transform.position + randomVec, Quaternion.identity);
+                    if (Random.Range(0f, 1f) <= pickup.probability)
+                    {
+                        for (int i = 0; i < pickup.quantity; i++)
+                        {
+                            randomVec = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), 0) * 0.75f;
+                            Instantiate(pickup.gameObject, transform.position + randomVec, Quaternion.identity);
+                        }
+                    }
                 }
+            }
+
+            foreach (EnemyDeathFunc func in GetComponentsInChildren<EnemyDeathFunc>())
+            {
+                func.OnDeath();
             }
         }
 
@@ -337,12 +361,19 @@ namespace com.egamesstudios.cell
             return (hit.collider);
         }
 
+        protected bool CheckWall(Vector2 direction, float distance)
+        {
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, distance, LayerMask.GetMask("Platform"));
+            return (hit.collider);
+        }
+
         protected virtual void OnCollisionEnter2D(Collision2D collision)
         {
             if (collision.gameObject.GetComponent<CellController>())
             {
-                collision.gameObject.GetComponent<CellController>().TakeHit(transform, castingAttack ? attackDamage : contactDamage, DamageType.ENEMY);
-                if (castingAttack) ChangeState(EnemyState.IDLE);
+                collision.gameObject.GetComponent<CellController>().TakeHit(transform, castingAttack ? enemyData.attackDamage : enemyData.contactDamage, DamageType.ENEMY);
+                // if (castingAttack) ChangeState(EnemyState.IDLE);
+                OnCollisionWithCell();
             }
         }
     }

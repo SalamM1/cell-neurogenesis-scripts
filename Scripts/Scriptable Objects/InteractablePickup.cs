@@ -20,7 +20,7 @@ namespace com.egamesstudios.cell
             Vector3 heading = VariableContainer.variableContainer.currentActive.transform.position - transform.position;
             if (heading.sqrMagnitude <= CELL_DISTANCE)
             {
-                transform.position += (heading.normalized * Time.deltaTime * 10);
+                transform.position += (heading.normalized * Time.deltaTime * 5);
             }
         }
         private void OnTriggerEnter2D(Collider2D collision)

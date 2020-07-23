@@ -37,10 +37,16 @@ namespace com.egamesstudios.cell
         IEnumerator DoorLoop(float moveSpeed)
         {
             yield return new WaitForSecondsRealtime(switchDoorDelay);
-            for (float travel = 0; travel < door.size; travel += this.moveSpeed)
+            float travel = 0;
+            while (travel < door.size*0.99f)
             {
                 transform.Translate(door.direction.GetVector()*moveSpeed);
                 yield return new WaitForSeconds(0.02f);
+                travel += this.moveSpeed;
+            }
+            if (travel != door.size)
+            {
+                transform.Translate(door.direction.GetVector() * (door.size - travel));
             }
             yield return new WaitForSeconds(0.8f);
         }

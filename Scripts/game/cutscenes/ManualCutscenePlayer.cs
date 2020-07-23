@@ -10,7 +10,6 @@ namespace com.egamesstudios.cell
     [RequireComponent(typeof(EventFlag))]
     public class ManualCutscenePlayer : MonoBehaviour
     {
-        [SerializeField]
         private ManualCutsceneClip[] cutsceneClips;
         [HideInInspector]
         public ManualCutsceneClip[] CutsceneClips { get { return cutsceneClips; } }

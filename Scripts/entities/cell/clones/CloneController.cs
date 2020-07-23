@@ -73,18 +73,19 @@ namespace com.egamesstudios.cell
         }
         void LateUpdate()
         {
+            // If currently in Cloning state, assume the Clone Menu is open
             if(mainCell.vars.activeState == State.CLONING)
             {
-                if(Input.GetKeyDown(KeyCode.B))
+                if(player.GetButtonDown("CreateClone"))
                 {
                     mainCell.ChangeState(State.CONTROL);
                 }
-                if(mainCell.player.GetButtonDown("Confirm"))
+                if(mainCell.player.GetButtonDown("Confirm") && cloneMenu.CanSelectClone())
                 {
                     CreateClone(cloneMenu.CreateClone());
                 }
             }
-            if(mainCell.vars.activeState == State.CONTROL && mainCell.vars.activeClones < 5 && mainCell.vars.maxHealth >= 40)
+            else if(mainCell.vars.activeState == State.CONTROL && mainCell.vars.activeClones < 5 && mainCell.vars.maxHealth >= 40)
             {
                 if (player.GetButtonDown("CreateClone"))
                 {
@@ -102,11 +103,12 @@ namespace com.egamesstudios.cell
                     SwitchClone(false);
             }
 
-            if(mainCell.vars.activeClones > 0 && currentActive.vars.isClone && player.GetButtonDown("KillClone"))
+            if (mainCell.vars.activeClones > 0 && currentActive.vars.isClone && player.GetButtonDown("KillClone"))
             {
                 if (currentActive.vars.isGateClone)
                 {
-                    if ((currentActive.vars.isOnGate && mainCell.vars.isOnGate) || IsInRangeOfCell()) DestroyActiveClone();
+                    if ((currentActive.vars.isOnGate && mainCell.vars.isOnGate) || IsInRangeOfCell()) 
+                        DestroyActiveClone();
                 }
                 else
                 {
@@ -136,7 +138,7 @@ namespace com.egamesstudios.cell
         private void EnterCloneMenu()
         {
             mainCell.ChangeState(State.CLONING);
-            cloneMenu.gameObject.SetActive(true);
+            cloneMenu.EnableMenu(true);
         }
 
         /// <summary>
@@ -144,7 +146,7 @@ namespace com.egamesstudios.cell
         /// </summary>
         public void ExitCloneMenu()
         {
-            cloneMenu.gameObject.SetActive(false);
+            cloneMenu.EnableMenu(false);
         }
 
         /// <summary>
@@ -249,7 +251,7 @@ namespace com.egamesstudios.cell
             mainCell.vars.activeClones--;
             mainCell.vars.maxHealth += 20;
             mainCell.vars.mainHealth += cloneToKill.vars.isGateClone ? 20 : 0;
-            Destroy(cloneToKill.gameObject, 0.25f);
+            Destroy(cloneToKill.gameObject, CameraManager.cameraManager.cloneTransitionTime*1.1f);
             UIManager.uIManager.SyncClones();
         }
 
@@ -276,7 +278,7 @@ namespace com.egamesstudios.cell
         /// <param name="cellToActive">The player/clone to set as the new active</param>
         private void SetActiveAndCam(CellController cellToActive)
         {
-            CameraManager.cameraManager.AddNewCell(cellToActive);
+            CameraManager.cameraManager.AddNewTarget(cellToActive.transform);
             cellToActive.gameObject.layer = 13;
             currentActive.gameObject.layer = 16;
             currentActive = cellToActive;

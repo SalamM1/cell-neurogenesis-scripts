@@ -7,9 +7,9 @@ namespace com.egamesstudios.cell
 	public class BeatBlockParent : MonoBehaviour
 	{
         [SerializeField]
-        private float BLOCK_TIMER = 5.0f; //Blink at 3.3, 3.9 and 4.5
+        private float BLOCK_TIMER = 5.0f; //Blink at 3.5, 4 and 4.5
         [SerializeField]
-        private float BLOCK_SOUND_TIMER = 0.6f;
+        private float BLOCK_SOUND_TIMER = 0.5f;
         private BeatBlockChild[] beatBlocks;
         private float blockTimer, blockSoundTimer;
         private bool playSound;

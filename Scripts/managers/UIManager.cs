@@ -22,10 +22,13 @@ namespace com.egamesstudios.cell
         public static UIManager uIManager;
         public UIState state = UIState.INGAME;
         public GameObject hud, dialogue, shop, startMenu, mainMenu, transition, selectMenu;
-        private float timeScale, fadeTime;
+        [HideInInspector]
+        public float fadeTime;
+        private float timeScale, waitBeforeFade;
 
         void Awake()
         {
+            fadeTime = 1.2f;
 
             if (uIManager == null)
                 uIManager = this;
@@ -46,7 +49,8 @@ namespace com.egamesstudios.cell
 
         public void ChangeState(UIState newState, bool dead = false)
         {
-            fadeTime = dead ? 2 : 0;
+            waitBeforeFade = dead ? 2 : 0;
+            Debug.Log("Going from State: " + state + " to State: " + newState);
             ExitState();
             EnterState(newState);
         }
@@ -58,6 +62,7 @@ namespace com.egamesstudios.cell
                 case UIState.MAINMENU:
                     break;
                 case UIState.STARTMENU:
+                    startMenu.SetActive(false);
                     break;
                 case UIState.SELECTMENU:
                     break;
@@ -69,6 +74,7 @@ namespace com.egamesstudios.cell
                     Time.timeScale = timeScale;
                     break;
                 case UIState.DIALOGUE:
+                    DialogueManager.dialogueManager.ExitState();
                     StartCoroutine(UIDialogueBox(dialogue.GetComponentInChildren<Image>(), false));
                     break;
                 case UIState.CUTSCENE:
@@ -84,6 +90,7 @@ namespace com.egamesstudios.cell
                 case UIState.MAINMENU:
                     break;
                 case UIState.STARTMENU:
+                    startMenu.SetActive(true);
                     break;
                 case UIState.SELECTMENU:
                     break;
@@ -123,13 +130,17 @@ namespace com.egamesstudios.cell
             // fade from transparent to opaque
             else
             {
-                yield return new WaitForSecondsRealtime(fadeTime);
-                for (float i = 0; i <= 1; i += 0.003f + 0.003f*(4f-fadeTime))
+                yield return new WaitForSecondsRealtime(waitBeforeFade);
+                float timePassed = 0;
+                while (timePassed <= fadeTime)
                 {
-                    image.color = new Color(1, 1, 1, i);
-                    yield return null;
+                    timePassed += Time.unscaledDeltaTime;
+                    image.color = new Color(1, 1, 1, timePassed/fadeTime);
+                    yield return new WaitForEndOfFrame();
                 }
                 image.color = new Color(1, 1, 1, 1);
+                if (dialogue.activeSelf)
+                    dialogue.SetActive(false);
             }
         }
 
